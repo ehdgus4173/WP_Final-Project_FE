@@ -1,0 +1,46 @@
+/* =====================================================
+   What'sToday · style.css
+   ===================================================== */
+
+/* ─── Design Tokens ──────────────────────────────── */
+:root {
+  --bg:           #FFFFFF;
+  --surface:      #F8F9FA;
+  --surface-2:    #F1F3F5;
+  --border:       #DEE2E6;
+  --border-light: #E9ECEF;
+  --text:         #212529;
+  --text-mid:     #495057;
+  --text-light:   #868E96;
+  --text-lighter: #ADB5BD;
+  --accent:       #3182F6;
+  --accent-soft:  rgba(49,130,246,0.10);
+  --success:      #20C997;
+  --danger:       #E03131;
+  --danger-soft:  rgba(224,49,49,0.08);
+  --danger-border: rgba(224,49,49,0.30);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --nav-h:     64px;
+
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.08);
+  --shadow-accent: 0 4px 20px rgba(49,130,246,0.15);
+}
+
+/* ─── Reset ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+a    { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea { font-family: inherit; }

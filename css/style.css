@@ -2,7 +2,7 @@
    What'sToday · style.css
    ===================================================== */
 
-/* ─── Design Tokens ──────────────────────────────── */
+/* commit 1─── Design Tokens ──────────────────────────────── */
 :root {
   --bg:           #FFFFFF;
   --surface:      #F8F9FA;
@@ -45,7 +45,7 @@ a    { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 input, textarea { font-family: inherit; }
 
-/* ─── Layout ─────────────────────────────────────── */
+/* commit 2─── Layout ─────────────────────────────────────── */
 .site {
   min-height: 100vh;
   display: flex;
@@ -121,4 +121,216 @@ input, textarea { font-family: inherit; }
   font-size: 13px;
   color: var(--text-light);
   text-align: center;
+}
+
+/* commit 3─── Buttons ────────────────────────────────────── */
+.accentBtn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s, transform 0.05s;
+}
+.accentBtn:hover    { background: #1971E0; }
+.accentBtn:active   { transform: scale(0.98); }
+.accentBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.primaryBtn {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ghostBtn {
+  background: transparent;
+  color: var(--text-mid);
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+}
+.ghostBtn:hover { background: var(--surface); color: var(--text); }
+
+.outlineBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+}
+.outlineBtn:hover { background: var(--surface); }
+
+.dangerBtn {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+}
+.dangerBtn:hover { background: var(--danger); color: white; }
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+}
+.iconBtn:hover { background: var(--surface); }
+
+/* ─── Forms ──────────────────────────────────────── */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.fieldGroup label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+.fieldGroup input,
+.fieldGroup textarea {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border 0.15s;
+}
+
+.fieldGroup input:focus,
+.fieldGroup textarea:focus {
+  border-color: var(--accent);
+}
+
+.fieldGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* ─── Avatar ─────────────────────────────────────── */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 50%;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.avatar.sm { width: 24px; height: 24px; font-size: 11px; }
+.avatar.md { width: 32px; height: 32px; font-size: 13px; }
+
+/* ─── Tag ────────────────────────────────────────── */
+.tag {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ─── Toast ──────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 1000;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ─── States ─────────────────────────────────────── */
+.loadingState,
+.emptyState,
+.errorState {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.errorState { color: var(--danger); }
+
+.errorMsg {
+  color: var(--danger);
+  font-size: 13px;
+  background: var(--danger-soft);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+
+/* ─── Back link ──────────────────────────────────── */
+.backLink {
+  display: inline-block;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+.backLink:hover { color: var(--text); }
+
+/* ─── Section header ─────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 32px 0 16px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text-light);
+  text-transform: uppercase;
+}
+
+.sectionCount {
+  font-size: 13px;
+  color: var(--text-light);
 }

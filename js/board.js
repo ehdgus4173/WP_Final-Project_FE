@@ -90,5 +90,22 @@ function setupWriteBar() {
   bar.style.display = 'flex';
 }
 
+// ─── Sort toggle handler ─────────────────────────────
+document.getElementById('sortToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-sort]');
+  if (!btn) return;
+
+  const newSort = btn.dataset.sort;
+  if (newSort === currentSort) return;
+
+  // Update active state
+  document.querySelectorAll('#sortToggle [data-sort]').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === newSort);
+  });
+
+  currentSort = newSort;
+  loadBoard();
+});
+
 // ─── Init ────────────────────────────────────────────
 loadBoard();

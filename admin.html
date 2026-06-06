@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · What'sToday</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navContainer"></div>
+
+  <main class="site">
+    <div class="container">
+
+      <!-- 페이지 제목 -->
+      <div class="sectionHeader">
+        <div>
+          <span class="sectionLabel">Admin</span>
+          <h1 style="font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-top:4px">
+            Publish Today's Issue
+          </h1>
+        </div>
+      </div>
+
+      <!-- 오늘 이슈 상태 -->
+      <div class="todayFeatured" style="cursor:default;margin-bottom:32px">
+        <div class="todayFeaturedLabel">Today's Status</div>
+        <div class="todayFeaturedTitle" id="todayStatus">No issue published yet</div>
+        <div class="todayFeaturedSummary" id="todayStatusSub">
+          Pick one of the AI-generated candidates below to publish as today's issue.
+        </div>
+      </div>
+
+      <!-- AI 추천 후보 목록 -->
+      <div class="sectionHeader">
+        <span class="sectionLabel">AI Candidates</span>
+        <button class="outlineBtn" id="regenerateBtn">Regenerate</button>
+      </div>
+
+      <!-- 후보 카드는 admin.js가 채움 -->
+      <div id="candidateList"></div>
+
+    </div>
+  </main>
+
+  <div id="footerContainer"></div>
+
+  <!-- 로드 순서: api.js → shared.js → admin.js -->
+  <script src="js/api.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

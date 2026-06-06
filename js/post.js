@@ -33,6 +33,7 @@ async function loadPost() {
     renderBackLink(currentPost);
     setupOwnerActions(currentPost);
     renderCommentCount(currentComments.length);
+    renderComments(currentComments);
   } catch (err) {
     console.error(err);
     document.getElementById('postContainer').innerHTML =
@@ -113,4 +114,101 @@ function setupOwnerActions(post) {
   actions.style.display = 'flex';
 }
 
-//
+// ─── Render comment list (tree structure) ────────────
+function renderComments(comments) {
+  const listEl = document.getElementById('commentList');
+
+  if (!comments || comments.length === 0) {
+    listEl.innerHTML = `<div class="emptyState">No comments yet. Start the discussion!</div>`;
+    return;
+  }
+
+  // Build parent-child map: parents (depth 0) with their replies (depth 1)
+  const parents = comments.filter(c => !c.parent_id);
+  const replies = comments.filter(c => c.parent_id);
+
+  const repliesByParent = {};
+  replies.forEach(r => {
+    if (!repliesByParent[r.parent_id]) repliesByParent[r.parent_id] = [];
+    repliesByParent[r.parent_id].push(r);
+  });
+
+  listEl.innerHTML = parents.map(parent => {
+    const childReplies = repliesByParent[parent.id] || [];
+    return `
+      ${renderCommentHTML(parent)}
+      ${childReplies.map(reply => renderCommentHTML(reply, true)).join('')}
+    `;
+  }).join('');
+}
+
+// ─── Single comment template ─────────────────────────
+function renderCommentHTML(comment, isReply = false) {
+  const user = Auth.getUser();
+  const username = comment.author?.username || 'Unknown';
+  const isOwn = user && user.id === comment.author?.id;
+
+  const likedClass = comment.liked_by_me ? 'active' : '';
+  const likeCount = comment.like_count ?? 0;
+
+  return `
+    <div class="commentItem ${isReply ? 'reply' : ''}" data-comment-id="${comment.id}">
+      <div class="commentMeta">
+        <strong>${escapeHTML(username)}</strong>
+        <span>·</span>
+        <span>${formatDateShort(comment.created_at)}</span>
+        ${isOwn ? `<button class="deleteCommentBtn" onclick="handleDeleteComment(${comment.id})">delete</button>` : ''}
+      </div>
+      <div class="commentBody">${escapeHTML(comment.content)}</div>
+      <div class="commentActions">
+        <button class="commentLikeBtn ${likedClass}" onclick="handleCommentLike(${comment.id}, this)">
+          ♥ <span class="likeCount">${likeCount}</span>
+        </button>
+        ${!isReply ? `<button class="replyBtn" onclick="handleReply(${comment.id}, '${escapeHTML(username)}')">Reply</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ─── Comment action handlers (placeholders for next commits) ───
+async function handleDeleteComment(commentId) {
+  if (!confirm('Delete this comment?')) return;
+  try {
+    await API.deleteComment(commentId);
+    showToast('Comment deleted');
+    setTimeout(() => window.location.reload(), 600);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to delete');
+  }
+}
+
+async function handleCommentLike(commentId, btn) {
+  if (!Auth.isLoggedIn()) {
+    window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
+    return;
+  }
+  const countEl = btn.querySelector('.likeCount');
+  const wasLiked = btn.classList.contains('active');
+
+  // Optimistic UI
+  btn.classList.toggle('active');
+  countEl.textContent = parseInt(countEl.textContent) + (wasLiked ? -1 : 1);
+
+  try {
+    await API.toggleCommentLike(commentId);
+  } catch (err) {
+    // Revert on failure
+    btn.classList.toggle('active');
+    countEl.textContent = parseInt(countEl.textContent) + (wasLiked ? 1 : -1);
+    showToast('Failed to like');
+  }
+}
+
+function handleReply(parentId, username) {
+  // Placeholder — implemented in next commit
+  showToast('Reply feature coming next');
+}
+
+// ─── Init ────────────────────────────────────────────
+loadPost();

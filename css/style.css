@@ -692,6 +692,45 @@ input, textarea { font-family: inherit; }
   border-bottom-color: var(--accent);
 }
 
+/* ─── Comment Reply Tree ─────────────────────────── */
+.commentItem.reply {
+  margin-left: 32px;
+  padding-left: 16px;
+  border-left: 2px solid var(--border-light);
+}
+
+.commentActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.commentLikeBtn,
+.replyBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.commentLikeBtn:hover,
+.replyBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.commentLikeBtn.active {
+  color: var(--danger);
+}
+
+.commentLikeBtn.active:hover {
+  background: var(--danger-soft);
+}
+
 /*Responsive*/
 @media (max-width: 700px) {
   .container    { padding: 0 18px; }
@@ -712,3 +751,4 @@ input, textarea { font-family: inherit; }
 
   .navRight span { display: none; }
 }
+

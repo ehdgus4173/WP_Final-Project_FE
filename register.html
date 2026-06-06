@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up · What'sToday</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navContainer"></div>
+
+  <main class="site">
+    <div class="container">
+      <div class="authGrid">
+        <h1>Create Account</h1>
+
+        <div class="errorMsg" id="errorMsg" style="display: none;"></div>
+
+        <div class="fieldGroup">
+          <label for="username">Username</label>
+          <input type="text" id="username" autocomplete="username" />
+        </div>
+
+        <div class="fieldGroup">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" />
+        </div>
+
+        <div class="fieldGroup">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="new-password" />
+          <span style="font-size:12px;color:var(--text-light)">At least 8 characters</span>
+        </div>
+
+        <div class="formActions">
+          <button class="accentBtn" id="registerBtn">Create Account</button>
+        </div>
+
+        <p style="margin-top:16px;font-size:14px;color:var(--text-light)">
+          Already have an account? <a href="login.html" style="color:var(--accent)">Log in</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footerContainer"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>

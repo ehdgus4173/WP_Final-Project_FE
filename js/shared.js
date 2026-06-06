@@ -104,11 +104,10 @@ function renderFooter(container) {
 // post: { id, title, content, author_username, created_at, comment_count, vote_score }
 // isOwn: true if the logged-in user authored this post
 function postRowHTML({ post, isOwn = false }) {
-  const body = post.content || post.body || '';
-  const snippet = body ? escapeHTML(body).slice(0, 120) + (body.length > 120 ? '…' : '') : '';
-  const initial = post.author_username ? post.author_username[0].toUpperCase() : '?';
-  const score = post.vote_score ?? post.score ?? 0;
-
+  const snippet = post.body_preview ? escapeHTML(post.body_preview) : '';
+  const username = post.author?.username || 'Unknown';
+  const initial = username[0].toUpperCase();
+  const score = post.score ?? 0;
   return `
     <div class="postRow">
       <div class="voteCol">
@@ -119,7 +118,7 @@ function postRowHTML({ post, isOwn = false }) {
       <div onclick="window.location='post.html?id=${post.id}'" style="cursor:pointer;min-width:0">
         <div class="postMeta">
           <div class="avatar sm">${escapeHTML(initial)}</div>
-          <strong>${escapeHTML(post.author_username || 'Unknown')}</strong>
+          <strong>${escapeHTML(username)}</strong>
           <span>·</span>
           <span>${formatDateShort(post.created_at)}</span>
           ${isOwn ? '<span class="tag" style="font-size:11px;padding:1px 6px">You</span>' : ''}

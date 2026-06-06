@@ -42,7 +42,7 @@ async function loadPostForEdit() {
     titleInput.value   = post.title;
     contentInput.value = post.content;
   } catch (err) {
-    showError('Could not load the post to edit.');
+    showToast('Could not load the post to edit.');
   }
 }
 
@@ -53,15 +53,15 @@ async function handleSubmit() {
 
   // 빈값 + 길이 검증 (명세: title 1~120자, content 20~10,000자)
   if (!title || !content) {
-    showError('Please fill in both title and content.');
+    showToast('Please fill in both title and content.');
     return;
   }
   if (title.length > 120) {
-    showError('Title must be 120 characters or less.');
+    showToast('Title must be 120 characters or less.');
     return;
   }
   if (content.length < 20) {
-    showError('Content must be at least 20 characters.');
+    showToast('Content must be at least 20 characters.');
     return;
   }
 
@@ -77,7 +77,7 @@ async function handleSubmit() {
     window.location.href = 'post.html?id=' + res.data.id;
   } catch (err) {
     // 명세 에러: 400 VALIDATION_ERROR / 401 / 403 NOT_OWNER / 404
-    showError(err.message || 'Could not save the post. Please try again.');
+    showToast(err.message || 'Could not save the post. Please try again.');
     submitBtn.disabled = false;
   }
 }

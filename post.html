@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post · What's Today</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="site">
+    <div id="navContainer"></div>
+
+    <main>
+      <div class="container">
+        <a id="backLink" href="index.html" class="backLink">← Back</a>
+
+        <!-- Post body -->
+        <section id="postContainer" class="postDetail">
+          <div class="loadingState">Loading post…</div>
+        </section>
+
+        <!-- Edit / Delete (own post only) -->
+        <div id="postActions" class="postActions" style="display:none">
+          <a id="editLink" class="outlineBtn">Edit</a>
+          <button id="deleteBtn" class="dangerBtn">Delete</button>
+        </div>
+
+        <!-- Comments -->
+        <section id="commentsSection">
+          <div class="sectionHeader">
+            <span id="commentCount" class="sectionLabel">Comments</span>
+          </div>
+
+          <!-- Comment write form (logged-in only) -->
+          <div id="commentFormContainer"></div>
+
+          <!-- Comment list -->
+          <div id="commentList">
+            <div class="loadingState">Loading comments…</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="footerContainer"></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="/js/post.js"></script>
+</body>
+</html>

@@ -252,20 +252,62 @@ async function handleCommentSubmit(e) {
     showToast('Comment is too short (min 2 characters)');
     return;
   }
+  if (content.length > 1000) {
+    showToast('Comment is too long (max 1000 characters)');
+    return;
+  }
 
   const submitBtn = e.target.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
 
   try {
-    await API.createComment(postId, content);
-    showToast('Comment posted');
+    const newComment = await API.createComment(postId, content);
+    appendNewComment(newComment);
     input.value = '';
-    // Reload to fetch fresh comments
-    setTimeout(() => window.location.reload(), 500);
+    showToast('Comment posted');
   } catch (err) {
     console.error(err);
-    showToast('Failed to post comment');
+    handleCommentError(err);
+  } finally {
     submitBtn.disabled = false;
+  }
+}
+
+// ─── Append new comment to DOM ──────────────────────
+function appendNewComment(comment) {
+  const listEl = document.getElementById('commentList');
+
+  // If empty state was showing, clear it first
+  const emptyState = listEl.querySelector('.emptyState');
+  if (emptyState) listEl.innerHTML = '';
+
+  // Append at the end (top-level comments) — replies handled separately later
+  listEl.insertAdjacentHTML('beforeend', renderCommentHTML(comment));
+
+  // Update count
+  currentComments.push(comment);
+  renderCommentCount(currentComments.length);
+}
+
+// ─── Handle comment-related API errors ──────────────
+function handleCommentError(err) {
+  const msg = err.message || '';
+  if (msg.includes('UNAUTHORIZED') || msg.includes('INVALID_TOKEN')) {
+    Auth.logout();
+    showToast('Session expired. Please log in again.');
+    setTimeout(() => {
+      window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
+    }, 1200);
+  } else if (msg.includes('VALIDATION_ERROR')) {
+    showToast('Invalid comment content');
+  } else if (msg.includes('POST_NOT_FOUND')) {
+    showToast('Post no longer exists');
+  } else if (msg.includes('PARENT_NOT_FOUND')) {
+    showToast('Reply target no longer exists');
+  } else if (msg.includes('CANNOT_REPLY_TO_REPLY')) {
+    showToast('Cannot reply to a reply');
+  } else {
+    showToast('Failed to post comment');
   }
 }
 

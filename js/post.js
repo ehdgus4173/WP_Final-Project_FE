@@ -34,6 +34,7 @@ async function loadPost() {
     setupOwnerActions(currentPost);
     renderCommentCount(currentComments.length);
     renderComments(currentComments);
+    setupCommentForm();
   } catch (err) {
     console.error(err);
     document.getElementById('postContainer').innerHTML =
@@ -208,6 +209,61 @@ async function handleCommentLike(commentId, btn) {
 function handleReply(parentId, username) {
   // Placeholder — implemented in next commit
   showToast('Reply feature coming next');
+}
+
+// ─── Setup comment write form ────────────────────────
+function setupCommentForm() {
+  const container = document.getElementById('commentFormContainer');
+
+  if (!Auth.isLoggedIn()) {
+    container.innerHTML = `
+      <a href="login.html?next=${encodeURIComponent(window.location.href)}"
+         class="loginToCommentBox">
+        sign in to comment
+      </a>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <form id="commentForm" class="commentForm">
+      <textarea id="commentInput"
+                placeholder="Add a comment…"
+                rows="3"
+                maxlength="1000"
+                required></textarea>
+      <button type="submit" class="accentBtn">Post comment</button>
+    </form>
+  `;
+
+  document.getElementById('commentForm').addEventListener('submit', handleCommentSubmit);
+}
+
+// ─── Handle comment submit ───────────────────────────
+async function handleCommentSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('commentInput');
+  const content = input.value.trim();
+
+  if (content.length < 2) {
+    showToast('Comment is too short (min 2 characters)');
+    return;
+  }
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+
+  try {
+    await API.createComment(postId, content);
+    showToast('Comment posted');
+    input.value = '';
+    // Reload to fetch fresh comments
+    setTimeout(() => window.location.reload(), 500);
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to post comment');
+    submitBtn.disabled = false;
+  }
 }
 
 // ─── Init ────────────────────────────────────────────

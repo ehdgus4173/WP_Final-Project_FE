@@ -731,6 +731,23 @@ input, textarea { font-family: inherit; }
   background: var(--danger-soft);
 }
 
+/* ─── Login to comment box ───────────────────────── */
+.loginToCommentBox {
+  display: block;
+  text-align: center;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  color: var(--text-light);
+  font-size: 14px;
+  margin-bottom: 24px;
+  transition: background 0.15s, color 0.15s;
+}
+.loginToCommentBox:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
 /*Responsive*/
 @media (max-width: 700px) {
   .container    { padding: 0 18px; }

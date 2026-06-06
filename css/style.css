@@ -692,6 +692,93 @@ input, textarea { font-family: inherit; }
   border-bottom-color: var(--accent);
 }
 
+/* ─── Comment Reply Tree ─────────────────────────── */
+.commentItem.reply {
+  margin-left: 32px;
+  padding-left: 16px;
+  border-left: 2px solid var(--border-light);
+}
+
+.commentActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.commentLikeBtn,
+.replyBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.commentLikeBtn:hover,
+.replyBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.commentLikeBtn.active {
+  color: var(--danger);
+}
+
+.commentLikeBtn.active:hover {
+  background: var(--danger-soft);
+}
+
+/* ─── Login to comment box ───────────────────────── */
+.loginToCommentBox {
+  display: block;
+  text-align: center;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  color: var(--text-light);
+  font-size: 14px;
+  margin-bottom: 24px;
+  transition: background 0.15s, color 0.15s;
+}
+.loginToCommentBox:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* ─── Reply Indicator ────────────────────────────── */
+.replyIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.replyIndicator strong {
+  font-weight: 600;
+}
+
+.cancelReplyBtn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.cancelReplyBtn:hover {
+  background: rgba(49,130,246,0.15);
+}
+
 /*Responsive*/
 @media (max-width: 700px) {
   .container    { padding: 0 18px; }
@@ -712,3 +799,4 @@ input, textarea { font-family: inherit; }
 
   .navRight span { display: none; }
 }
+

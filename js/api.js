@@ -2,7 +2,7 @@
 // What'sToday · api.js — Central API Client
 // =====================================================
 
-const BASE = '/api';
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('wt_token');

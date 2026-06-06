@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · What'sToday</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script>window.__API_BASE__ = '%VITE_API_URL%';</script>
+</head>
+<body>
+  <div class="site">
+    <div id="navContainer"></div>
+
+    <main>
+      <div class="container">
+
+        <!-- 페이지 제목 -->
+        <div class="sectionHeader">
+          <div>
+            <span class="sectionLabel">Admin</span>
+            <h1 class="adminPageTitle">Review Pending Issues</h1>
+          </div>
+        </div>
+
+        <!-- 오늘 이슈 상태 -->
+        <div class="todayFeatured adminTodayStatus">
+          <div class="todayFeaturedLabel">Today's Status</div>
+          <div class="todayFeaturedTitle" id="todayStatus">Loading…</div>
+          <div class="todayFeaturedSummary" id="todayStatusSub">
+            Approve a pending candidate to publish it as today's issue.
+          </div>
+        </div>
+
+        <!-- Pending 목록 -->
+        <div class="sectionHeader">
+          <span class="sectionLabel">Pending Issues</span>
+        </div>
+
+        <div id="candidateList">
+          <div class="loadingState">Loading candidates…</div>
+        </div>
+
+      </div>
+    </main>
+
+    <div id="footerContainer"></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

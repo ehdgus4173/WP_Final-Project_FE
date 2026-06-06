@@ -15,6 +15,7 @@ export default defineConfig({
         board: resolve(__dirname, 'board.html'),
         post: resolve(__dirname, 'post.html'),
         write: resolve(__dirname, 'write.html'),
+        admin: resolve(__dirname, 'admin.html')
       },
     },
   },

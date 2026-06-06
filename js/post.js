@@ -39,7 +39,10 @@ async function loadPost() {
     console.error(err);
     document.getElementById('postContainer').innerHTML =
       `<div class="errorState">Failed to load post.</div>`;
+    // Hide comment section entirely — no post = no comments to show
+    document.getElementById('commentsSection').style.display = 'none';
   }
+
 }
 
 // ─── Render post body ────────────────────────────────

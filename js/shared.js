@@ -67,11 +67,16 @@ function renderNav({ activePage = 'home', container }) {
     : `<a href="login.html" class="ghostBtn">Log in</a>
        <a href="register.html" class="primaryBtn">Sign up</a>`;
 
+  const adminLink = user && user.role === 'admin'
+    ? `<a href="admin.html" class="${activePage === 'admin' ? 'active' : ''}">Admin</a>`
+    : '';
+
   container.innerHTML = `
     <header class="siteNav">
       <a href="index.html" class="siteLogo">What'sToday</a>
       <nav class="navMenu">
         <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
+        ${adminLink}
       </nav>
       <span class="navSpacer"></span>
       <div class="navRight">

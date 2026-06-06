@@ -210,8 +210,43 @@ async function handleCommentLike(commentId, btn) {
 }
 
 function handleReply(parentId, username) {
-  // Placeholder — implemented in next commit
-  showToast('Reply feature coming next');
+  if (!Auth.isLoggedIn()) {
+    window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
+    return;
+  }
+
+  const input = document.getElementById('commentInput');
+  const indicator = document.getElementById('replyIndicator');
+  const replyToEl = document.getElementById('replyToUsername');
+
+  if (!input) return;  // form not rendered (e.g. logged out)
+
+  // Track parent on the textarea itself
+  input.dataset.replyTo = parentId;
+
+  // Prefill mention prefix
+  input.value = `@${username} `;
+
+  // Show indicator
+  replyToEl.textContent = `@${username}`;
+  indicator.style.display = 'flex';
+
+  // Scroll to form + focus
+  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => {
+    input.focus();
+    // Place cursor at end
+    input.setSelectionRange(input.value.length, input.value.length);
+  }, 300);
+}
+
+function cancelReply() {
+  const input = document.getElementById('commentInput');
+  const indicator = document.getElementById('replyIndicator');
+
+  delete input.dataset.replyTo;
+  input.value = '';
+  indicator.style.display = 'none';
 }
 
 // ─── Setup comment write form ────────────────────────
@@ -230,6 +265,10 @@ function setupCommentForm() {
 
   container.innerHTML = `
     <form id="commentForm" class="commentForm">
+      <div id="replyIndicator" class="replyIndicator" style="display:none">
+        <span>Replying to <strong id="replyToUsername"></strong></span>
+        <button type="button" class="cancelReplyBtn" onclick="cancelReply()">× cancel</button>
+      </div>
       <textarea id="commentInput"
                 placeholder="Add a comment…"
                 rows="3"
@@ -260,11 +299,15 @@ async function handleCommentSubmit(e) {
   const submitBtn = e.target.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
 
+  const parentId = input.dataset.replyTo ? parseInt(input.dataset.replyTo) : null;
+
   try {
-    const newComment = await API.createComment(postId, content);
+    const newComment = await API.createComment(postId, content, parentId);
     appendNewComment(newComment);
     input.value = '';
-    showToast('Comment posted');
+    delete input.dataset.replyTo;
+    document.getElementById('replyIndicator').style.display = 'none';
+    showToast(parentId ? 'Reply posted' : 'Comment posted');
   } catch (err) {
     console.error(err);
     handleCommentError(err);
@@ -281,14 +324,37 @@ function appendNewComment(comment) {
   const emptyState = listEl.querySelector('.emptyState');
   if (emptyState) listEl.innerHTML = '';
 
-  // Append at the end (top-level comments) — replies handled separately later
-  listEl.insertAdjacentHTML('beforeend', renderCommentHTML(comment));
+  const isReply = !!comment.parent_id;
 
-  // Update count
+  if (isReply) {
+    // Insert under the parent comment (after any existing replies)
+    const parentEl = listEl.querySelector(`[data-comment-id="${comment.parent_id}"]`);
+    if (parentEl) {
+      // Find the last existing reply to this parent, or insert right after parent
+      let insertAfter = parentEl;
+      let sibling = parentEl.nextElementSibling;
+      while (sibling && sibling.classList.contains('reply')) {
+        // Walk past existing replies
+        if (sibling.dataset.commentId &&
+            currentComments.find(c => c.id == sibling.dataset.commentId)?.parent_id == comment.parent_id) {
+          insertAfter = sibling;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+      insertAfter.insertAdjacentHTML('afterend', renderCommentHTML(comment, true));
+    } else {
+      // Parent not found — fallback to end
+      listEl.insertAdjacentHTML('beforeend', renderCommentHTML(comment, true));
+    }
+  } else {
+    // Top-level comment → append at the end
+    listEl.insertAdjacentHTML('beforeend', renderCommentHTML(comment));
+  }
+
+  // Update state + count
   currentComments.push(comment);
   renderCommentCount(currentComments.length);
 }
-
 // ─── Handle comment-related API errors ──────────────
 function handleCommentError(err) {
   const msg = err.message || '';

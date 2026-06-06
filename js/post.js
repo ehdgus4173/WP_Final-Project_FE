@@ -117,7 +117,11 @@ function setupOwnerActions(post) {
 
   actions.style.display = 'flex';
 }
-
+// ─── Render comment count ────────────────────────────
+function renderCommentCount(count) {
+  const el = document.getElementById('commentCount');
+  if (el) el.textContent = `${count} Comment${count === 1 ? '' : 's'}`;
+}
 // ─── Render comment list (tree structure) ────────────
 function renderComments(comments) {
   const listEl = document.getElementById('commentList');

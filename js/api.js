@@ -2,8 +2,8 @@
 // What'sToday · api.js — Central API Client
 // =====================================================
 
-const BASE = '/api';
-
+// __API_BASE__ is injected at build time by Vite (see vite.config.js)
+const BASE = window.__API_BASE__ || '/api';
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('wt_token');
 
@@ -19,8 +19,8 @@ async function apiFetch(path, options = {}) {
   if (res.status === 204) return null;
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
-  return data;
+  if (!res.ok) throw new Error(data.message || data.error?.message || `Error ${res.status}`);
+  return data.data !== undefined ? data.data : data;
 }
 
 const API = {
@@ -34,15 +34,15 @@ const API = {
   me       : () =>
     apiFetch('/auth/me'),
 
-  // ── Home (aggregated: today + past 10) ────────────
+  // ── Home ──────────────────────────────────────────
   getHome  : () =>
     apiFetch('/home'),
 
-  // ── Issues (aggregated: issue + posts) ────────────
+  // ── Issues ────────────────────────────────────────
   getIssue : (id, sort = 'top') =>
     apiFetch(`/issues/${id}?sort=${sort}`),
 
-  // ── Posts (aggregated: post + comments) ───────────
+  // ── Posts ─────────────────────────────────────────
   getPost    : (id) =>
     apiFetch(`/posts/${id}`),
 
@@ -55,17 +55,33 @@ const API = {
   deletePost : (id) =>
     apiFetch(`/posts/${id}`, { method: 'DELETE' }),
 
-  // ── Votes ─────────────────────────────────────────
+  // ── Votes (toggle) ────────────────────────────────
+  // Single endpoint: same value cancels, opposite value switches.
   votePost   : (id, value) =>
-    apiFetch(`/posts/${id}/votes`, { method: 'POST', body: { value } }),  // value: 1 or -1
-
-  unvotePost : (id) =>
-    apiFetch(`/posts/${id}/votes`, { method: 'DELETE' }),
+    apiFetch(`/posts/${id}/votes`, { method: 'POST', body: { value } }),
 
   // ── Comments ──────────────────────────────────────
-  createComment : (postId, content) =>
-    apiFetch(`/posts/${postId}/comments`, { method: 'POST', body: { content } }),
+  // parentId is null for top-level comments, comment_id for 1-depth replies.
+  createComment : (postId, content, parentId = null) =>
+    apiFetch(`/posts/${postId}/comments`, {
+      method: 'POST',
+      body: { content, parent_id: parentId },
+    }),
 
   deleteComment : (id) =>
     apiFetch(`/comments/${id}`, { method: 'DELETE' }),
+
+  // ── Comment Likes (toggle) ────────────────────────
+  toggleCommentLike : (id) =>
+    apiFetch(`/comments/${id}/likes`, { method: 'POST' }),
+
+  // ── Admin ─────────────────────────────────────────
+  adminGetPendingIssues : () =>
+    apiFetch('/admin/issues?status=pending'),
+
+  adminApproveIssue : (id) =>
+    apiFetch(`/admin/issues/${id}`, { method: 'PATCH' }),
+
+  adminRejectIssue : (id) =>
+    apiFetch(`/admin/issues/${id}`, { method: 'DELETE' }),
 };

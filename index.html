@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What's Today</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script>window.__API_BASE__ = '%VITE_API_URL%';</script>
+</head>
+<body>
+  <div class="site">
+    <div id="navContainer"></div>
+
+    <main>
+      <section class="pageHero">
+        <h1><span class="hash">#</span>What's Today!</h1>
+        <p class="subhead">AI-curated daily issues. Real conversations.</p>
+      </section>
+
+      <div class="container">
+        <!-- Today's Issue (highlighted card) -->
+        <section id="todaySection">
+          <div class="sectionHeader">
+            <span class="sectionLabel">Today</span>
+          </div>
+          <div id="todayContent">
+            <div class="loadingState">Loading today's issue…</div>
+          </div>
+        </section>
+
+        <!-- Past Issues (archive list) -->
+        <section id="archiveSection">
+          <div class="sectionHeader">
+            <span class="sectionLabel">Past Issues</span>
+          </div>
+          <div id="archiveContent">
+            <div class="loadingState">Loading past issues…</div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <div id="footerContainer"></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="/js/index.js"></script>
+</body>
+</html>

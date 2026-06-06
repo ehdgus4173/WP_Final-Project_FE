@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Issue · What's Today</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script>window.__API_BASE__ = '%VITE_API_URL%';</script>
+</head>
+<body>
+  <div class="site">
+    <div id="navContainer"></div>
+
+    <main>
+      <div class="container">
+        <a href="index.html" class="backLink">← Back</a>
+
+        <!-- Issue header -->
+        <section id="issueHeader" class="issueDetail">
+          <div class="loadingState">Loading issue…</div>
+        </section>
+
+        <!-- Write bar (logged-in only) -->
+        <div id="writeBar" class="writeBar" style="display:none">
+          <a id="writeLink" class="accentBtn">+ Write a post</a>
+        </div>
+
+        <!-- Sort toggle + post count -->
+        <div class="sectionHeader">
+          <span id="postCount" class="sectionCount">0 posts</span>
+          <div id="sortToggle" style="display:none">
+            <button class="ghostBtn active" data-sort="top">Top</button>
+            <button class="ghostBtn" data-sort="latest">Latest</button>
+          </div>
+        </div>
+
+        <!-- Post list -->
+        <section id="postList">
+          <div class="loadingState">Loading posts…</div>
+        </section>
+      </div>
+    </main>
+
+    <div id="footerContainer"></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="/js/board.js"></script>
+</body>
+</html>

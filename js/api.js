@@ -80,7 +80,7 @@ const API = {
     apiFetch('/admin/issues?status=pending'),
 
   adminApproveIssue : (id) =>
-    apiFetch(`/admin/issues/${id}`, { method: 'PATCH' }),
+    apiFetch(`/admin/issues/${id}`, { method: 'PATCH', body: { status: 'published' } }),
 
   adminRejectIssue : (id) =>
     apiFetch(`/admin/issues/${id}`, { method: 'DELETE' }),

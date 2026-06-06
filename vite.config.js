@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { copyFileSync, readdirSync, mkdirSync, existsSync } from 'fs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -17,4 +18,17 @@ export default defineConfig({
       },
     },
   },
+  plugins: [
+    {
+      name: 'copy-js',
+      closeBundle() {
+        const srcDir = resolve(__dirname, 'js');
+        const destDir = resolve(__dirname, 'dist/js');
+        if (!existsSync(destDir)) mkdirSync(destDir, { recursive: true });
+        readdirSync(srcDir).forEach(file => {
+          copyFileSync(resolve(srcDir, file), resolve(destDir, file));
+        });
+      },
+    },
+  ],
 });

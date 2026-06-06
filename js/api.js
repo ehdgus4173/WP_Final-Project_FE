@@ -19,7 +19,12 @@ async function apiFetch(path, options = {}) {
   if (res.status === 204) return null;
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || data.error?.message || `Error ${res.status}`);
+  if (!res.ok) {
+  const error = new Error(data.error?.message || data.message || `Error ${res.status}`);
+  error.code = data.error?.code;
+  error.status = res.status;
+  throw error;
+}
   return data.data !== undefined ? data.data : data;
 }
 
@@ -80,7 +85,7 @@ const API = {
     apiFetch('/admin/issues?status=pending'),
 
   adminApproveIssue : (id) =>
-    apiFetch(`/admin/issues/${id}`, { method: 'PATCH' }),
+    apiFetch(`/admin/issues/${id}`, { method: 'PATCH', body: { status: 'published' } }),
 
   adminRejectIssue : (id) =>
     apiFetch(`/admin/issues/${id}`, { method: 'DELETE' }),

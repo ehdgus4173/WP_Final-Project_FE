@@ -54,6 +54,10 @@ function renderPost(post) {
   const username = post.author?.username || 'Unknown';
   const initial = username[0].toUpperCase();
 
+  const userVote = post.user_vote ?? 0;  // 1, -1, or 0
+  const upActive   = userVote === 1  ? 'active' : '';
+  const downActive = userVote === -1 ? 'active' : '';
+
   el.innerHTML = `
     <div class="postDetailMeta">
       <div class="avatar sm">${escapeHTML(initial)}</div>
@@ -64,6 +68,12 @@ function renderPost(post) {
     </div>
     <h1 class="postDetailTitle">${escapeHTML(post.title)}</h1>
     <div class="postDetailBody">${escapeHTML(post.content || '')}</div>
+
+    <div class="postDetailVote">
+      <button class="voteBtn up ${upActive}" onclick="handleVote(event, this, 1, ${post.id})">▲</button>
+      <span class="voteScore">${post.score ?? 0}</span>
+      <button class="voteBtn down ${downActive}" onclick="handleVote(event, this, -1, ${post.id})">▼</button>
+    </div>
   `;
 }
 

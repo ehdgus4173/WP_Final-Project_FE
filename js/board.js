@@ -76,7 +76,7 @@ function renderPosts(posts) {
   listEl.innerHTML = posts
     .map(post => postRowHTML({
       post,
-      isOwn: user && user.id === post.author_id,
+      isOwn: user && user.id === post.author?.id,
     }))
     .join('');
 }

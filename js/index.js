@@ -13,8 +13,8 @@ renderFooter(document.getElementById('footerContainer'));
 async function loadHome() {
   try {
     const data = await API.getHome();
-    renderToday(data.today);
-    renderArchive(data.past);
+    renderToday(data.today_issue);
+    renderArchive(data.past_issues);
   } catch (err) {
     console.error(err);
     document.getElementById('todayContent').innerHTML =

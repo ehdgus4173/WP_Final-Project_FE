@@ -27,10 +27,9 @@ async function handleLogin() {
 
   loginBtn.disabled = true;
   try {
-    const res = await API.login(email, password);
-    // 백엔드 공통 응답: { success, data: { token, user } }
-    // apiFetch가 통째로 반환하므로 res.data에서 꺼냄
-    const { token, user } = res.data;
+    // apiFetch already unwraps { success, data } and returns the data payload directly.
+    // So the response is already { token, user }.
+    const { token, user } = await API.login(email, password);
 
     localStorage.setItem('wt_token', token);  // JWT를 wt_token 키에 직접 저장
     Auth.setUser(user);                        // user는 setUser가 wt_user에 저장

@@ -36,9 +36,7 @@ if (isEdit) {
 // ─── 수정 모드: 기존 글 불러오기 (prefill) ────────────
 async function loadPostForEdit() {
   try {
-    const res = await API.getPost(postId);
-    // 통합 응답: { post: {...}, comments: [...] } → post만 사용
-    const post = res.data.post;
+    const { post } = await API.getPost(postId);
     titleInput.value   = post.title;
     contentInput.value = post.content;
   } catch (err) {
@@ -67,14 +65,11 @@ async function handleSubmit() {
 
   submitBtn.disabled = true;
   try {
-    let res;
-    if (isEdit) {
-      res = await API.updatePost(postId, title, content);   // PUT /posts/:id
-    } else {
-      res = await API.createPost(issueId, title, content);  // POST /issues/:id/posts
-    }
+    const result = isEdit
+      ? await API.updatePost(postId, title, content)   // PUT /posts/:id → { id, title, updated_at }
+      : await API.createPost(issueId, title, content); // POST /issues/:id/posts → { id, issue_id, title, created_at }
     // 작성·수정 둘 다 응답 data.id 로 글 id 반환 → 상세 페이지로 이동
-    window.location.href = 'post.html?id=' + res.data.id;
+    window.location.href = 'post.html?id=' + result.id;
   } catch (err) {
     // 명세 에러: 400 VALIDATION_ERROR / 401 / 403 NOT_OWNER / 404
     showToast(err.message || 'Could not save the post. Please try again.');

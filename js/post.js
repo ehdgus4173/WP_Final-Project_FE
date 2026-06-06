@@ -177,13 +177,53 @@ function renderCommentHTML(comment, isReply = false) {
 // ─── Comment action handlers (placeholders for next commits) ───
 async function handleDeleteComment(commentId) {
   if (!confirm('Delete this comment?')) return;
+
   try {
     await API.deleteComment(commentId);
+    removeCommentFromDOM(commentId);
     showToast('Comment deleted');
-    setTimeout(() => window.location.reload(), 600);
   } catch (err) {
     console.error(err);
     showToast('Failed to delete');
+  }
+}
+
+// ─── Remove comment from DOM ────────────────────────
+function removeCommentFromDOM(commentId) {
+  const listEl = document.getElementById('commentList');
+
+  // Find the comment element
+  const commentEl = listEl.querySelector(`[data-comment-id="${commentId}"]`);
+  if (!commentEl) return;
+
+  // If this is a parent comment, also remove its replies
+  const deletedComment = currentComments.find(c => c.id == commentId);
+  const isParent = deletedComment && !deletedComment.parent_id;
+
+  // Collect IDs to remove
+  const idsToRemove = [commentId];
+  if (isParent) {
+    // Find all child replies of this parent
+    currentComments
+      .filter(c => c.parent_id == commentId)
+      .forEach(reply => idsToRemove.push(reply.id));
+  }
+
+  // Remove from DOM
+  idsToRemove.forEach(id => {
+    const el = listEl.querySelector(`[data-comment-id="${id}"]`);
+    if (el) el.remove();
+  });
+
+  // Remove from state
+  currentComments = currentComments.filter(c => !idsToRemove.includes(c.id));
+
+  // Update count
+  renderCommentCount(currentComments.length);
+
+  // If no comments left, show empty state
+  if (currentComments.length === 0) {
+    listEl.innerHTML = `<div class="emptyState">No comments yet. Start the discussion!</div>`;
   }
 }
 

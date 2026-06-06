@@ -146,17 +146,20 @@ async function handleVote(e, btn, value, postId) {
   const scoreEl = col.querySelector('.voteScore');
 
   const alreadyActive = btn.classList.contains('active');
+  const wasOpposite = !alreadyActive && (value === 1 ? downBtn : upBtn).classList.contains('active');
 
+  // Optimistic UI update
   upBtn.classList.remove('active');
   downBtn.classList.remove('active');
 
   try {
+    // Backend toggles automatically: same value cancels, opposite switches.
+    await API.votePost(postId, value);
+
     if (alreadyActive) {
-      await API.unvotePost(postId);
+      // Same vote → cancelled
       scoreEl.textContent = parseInt(scoreEl.textContent) + (value === 1 ? -1 : 1);
     } else {
-      const wasOpposite = (value === 1 ? downBtn : upBtn).classList.contains('active');
-      await API.votePost(postId, value);
       btn.classList.add('active');
       const delta = value === 1 ? (wasOpposite ? 2 : 1) : (wasOpposite ? -2 : -1);
       scoreEl.textContent = parseInt(scoreEl.textContent) + delta;

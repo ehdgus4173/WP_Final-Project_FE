@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write · What'sToday</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="navContainer"></div>
+
+  <main class="site">
+    <div class="container">
+      <div class="writeGrid">
+        <!-- 모드(새글/수정)에 따라 write.js가 텍스트 바꿈 -->
+        <h1 class="writeHeading" id="writeHeading">New Post</h1>
+
+        <div class="errorMsg" id="errorMsg" style="display: none;"></div>
+
+        <div class="fieldGroup">
+          <label for="title">Title</label>
+          <input type="text" id="title" />
+        </div>
+
+        <div class="fieldGroup">
+          <label for="content">Content</label>
+          <textarea id="content" rows="12"></textarea>
+        </div>
+
+        <div class="formActions">
+          <button class="accentBtn" id="submitBtn">Publish</button>
+          <button class="ghostBtn" id="cancelBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footerContainer"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/write.js"></script>
+</body>
+</html>

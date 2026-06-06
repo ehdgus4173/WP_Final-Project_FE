@@ -2,8 +2,8 @@
 // What'sToday · api.js — Central API Client
 // =====================================================
 
-const BASE = import.meta.env.VITE_API_URL || '/api';
-
+// __API_BASE__ is injected at build time by Vite (see vite.config.js)
+const BASE = window.__API_BASE__ || '/api';
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('wt_token');
 

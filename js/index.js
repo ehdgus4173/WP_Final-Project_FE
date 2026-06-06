@@ -45,7 +45,23 @@ function renderToday(issue) {
 
 // ─── Placeholder for archive (next commit) ───────────
 function renderArchive(issues) {
-  document.getElementById('archiveContent').innerHTML = '';
+  const el = document.getElementById('archiveContent');
+
+  if (!issues || issues.length === 0) {
+    el.innerHTML = `<div class="emptyState">No past issues yet.</div>`;
+    return;
+  }
+
+  el.innerHTML = issues.map(issue => `
+    <div class="archiveRow" onclick="window.location='board.html?id=${issue.id}'">
+      <div>
+        <span class="archiveRowDate">${formatDateShort(issue.created_at)}</span>
+        <div class="archiveRowTitle">${escapeHTML(issue.title)}</div>
+        <div class="archiveRowSummary">${escapeHTML(issue.summary || '')}</div>
+      </div>
+      <div class="archiveRowCount">💬 ${issue.post_count ?? 0}</div>
+    </div>
+  `).join('');
 }
 
 // ─── Init ────────────────────────────────────────────

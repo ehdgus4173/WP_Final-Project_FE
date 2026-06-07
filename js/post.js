@@ -95,7 +95,9 @@ function renderBackLink(post) {
 // ─── Setup owner actions (Edit / Delete) ─────────────
 function setupOwnerActions(post) {
   const user = Auth.getUser();
-  if (!user || user.id !== post.author?.id) return;
+  const isOwner = user && String(user.id) === String(post.author?.id);
+  const isAdmin = user && user.role === 'admin';
+  if (!isOwner && !isAdmin) return;
 
   const actions = document.getElementById('postActions');
   const editLink = document.getElementById('editLink');
@@ -154,7 +156,9 @@ function renderComments(comments) {
 function renderCommentHTML(comment, isReply = false) {
   const user = Auth.getUser();
   const username = comment.author?.username || 'Unknown';
-  const isOwn = user && user.id === comment.author?.id;
+  const isOwn = user && String(user.id) === String(comment.author?.id);
+  const isAdmin = user && user.role === 'admin';
+  const canDelete = isOwn || isAdmin;
 
   const likedClass = comment.liked_by_me ? 'active' : '';
   const likeCount = comment.like_count ?? 0;
@@ -165,7 +169,7 @@ function renderCommentHTML(comment, isReply = false) {
         <strong>${escapeHTML(username)}</strong>
         <span>·</span>
         <span>${formatDateShort(comment.created_at)}</span>
-        ${isOwn ? `<button class="deleteCommentBtn" onclick="handleDeleteComment(${comment.id})">delete</button>` : ''}
+        ${canDelete ? `<button class="deleteCommentBtn" onclick="handleDeleteComment(${comment.id})">delete</button>` : ''}
       </div>
       <div class="commentBody">${escapeHTML(comment.content)}</div>
       <div class="commentActions">

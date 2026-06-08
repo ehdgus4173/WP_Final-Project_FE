@@ -947,6 +947,21 @@ button:disabled,
   cursor: not-allowed;
 }
 
+/* ─── Section Header Row (with action button) ─── */
+.sectionHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── Disabled button state ──────────────────────── */
+button:disabled,
+.accentBtn:disabled,
+.dangerBtn:disabled,
+.outlineBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 /*Responsive*/
 @media (max-width: 700px) {
   .container    { padding: 0 18px; }

@@ -1,8 +1,9 @@
 // =====================================================
 // What'sToday · mypage.js — User Profile Page
+// Own page (?id absent or = my id): editable.
+// Another user's page (?id = other): read-only.
 // =====================================================
 
-// ─── Render nav + footer ─────────────────────────────
 renderNav({
   activePage: 'mypage',
   container: document.getElementById('navContainer'),
@@ -11,8 +12,14 @@ renderFooter(document.getElementById('footerContainer'));
 
 const container = document.getElementById('myPageContainer');
 
-// ─── Require login ───────────────────────────────────
-if (!Auth.isLoggedIn()) {
+// ─── Who are we viewing? ─────────────────────────────
+const viewId = new URLSearchParams(window.location.search).get('id');
+const currentUser = Auth.getUser();
+const isOwn = !viewId || (currentUser && String(viewId) === String(currentUser.id));
+const canEdit = !!isOwn && !!currentUser;
+
+// Only the OWN page requires login. Other users' pages are public read-only.
+if (!viewId && !currentUser) {
   window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
 }
 
@@ -23,18 +30,17 @@ let currentPosts = [];
 // ─── Load profile + recent posts ─────────────────────
 async function loadMyPage() {
   try {
-    const [meData, postsData] = await Promise.all([
-      API.me(),
-      // posts endpoint may not exist yet (before backend deploy) — degrade gracefully
-      API.myPosts(3).catch(() => ({ posts: [] })),
+    const [profile, postsData] = await Promise.all([
+      isOwn ? API.me() : API.getUser(viewId),
+      (isOwn ? API.myPosts(3) : API.getUserPosts(viewId, 3)).catch(() => ({ posts: [] })),
     ]);
-    me = meData.user;
+    me = profile.user;
     currentPosts = postsData.posts || [];
     renderMyPage();
   } catch (err) {
     console.error(err);
     handleAuthError(err);
-    container.innerHTML = `<div class="errorState">Failed to load your page.</div>`;
+    container.innerHTML = `<div class="errorState">Failed to load this page.</div>`;
   }
 }
 
@@ -57,7 +63,7 @@ function renderMyPage() {
     <div class="fieldBlock">
       <div class="fieldLabel">email</div>
       <div class="fieldRow">
-        <div class="fieldValue readonly">${escapeHTML(me.email)}</div>
+        <div class="fieldValue readonly">${escapeHTML(me.email || '')}</div>
       </div>
     </div>
 
@@ -72,15 +78,15 @@ function renderMyPage() {
     </div>
   `;
 
-  bindViewHandlers();
+  if (canEdit) bindViewHandlers();
 }
 
 // ─── Username row (view / edit) ──────────────────────
 function usernameViewHTML() {
-  return `
-    <div class="fieldValue">${escapeHTML(me.username)}</div>
-    <button class="editBtn" id="editUsernameBtn" title="Edit username" aria-label="Edit username">✎</button>
-  `;
+  const editBtn = canEdit
+    ? `<button class="editBtn" id="editUsernameBtn" title="Edit username" aria-label="Edit username">✎</button>`
+    : '';
+  return `<div class="fieldValue">${escapeHTML(me.username)}</div>${editBtn}`;
 }
 
 function editUsername() {
@@ -136,11 +142,11 @@ async function saveUsername() {
 function descViewHTML(hasDesc) {
   const text = hasDesc
     ? escapeHTML(me.description)
-    : 'Add a short description about yourself…';
-  return `
-    <div class="descValue ${hasDesc ? '' : 'empty'}">${text}</div>
-    <button class="editBtn" id="editDescBtn" title="Edit description" aria-label="Edit description">✎</button>
-  `;
+    : (canEdit ? 'Add a short description about yourself…' : 'No description yet.');
+  const editBtn = canEdit
+    ? `<button class="editBtn" id="editDescBtn" title="Edit description" aria-label="Edit description">✎</button>`
+    : '';
+  return `<div class="descValue ${hasDesc ? '' : 'empty'}">${text}</div>${editBtn}`;
 }
 
 function editDescription() {

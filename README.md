@@ -4,7 +4,6 @@ A daily-news discussion platform powered by AI-curated topics.
 Every day an AI selects one trending issue, an admin reviews and publishes it, and users post opinions, vote, and discuss in threaded comments.
 
 
-[![CI](https://github.com/ehdgus4173/WP_Final-Project_FE/actions/workflows/ci.yml/badge.svg)](https://github.com/ehdgus4173/WP_Final-Project_FE/actions/workflows/ci.yml)
 
 ## Live Demo
 

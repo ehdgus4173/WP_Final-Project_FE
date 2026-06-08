@@ -155,10 +155,9 @@ function postRowHTML({ post, isOwn = false }) {
   const score = post.score ?? 0;
   return `
     <div class="postRow">
-      <div class="voteCol">
-        <button class="voteBtn up" onclick="handleVote(event, this, 1, ${post.id})">▲</button>
+      <div class="voteCol scoreCol">
+        <span class="scoreHeart">♥</span>
         <span class="voteScore">${score}</span>
-        <button class="voteBtn down" onclick="handleVote(event, this, -1, ${post.id})">▼</button>
       </div>
       <div onclick="window.location='post.html?id=${post.id}'" style="cursor:pointer;min-width:0">
         <div class="postMeta">

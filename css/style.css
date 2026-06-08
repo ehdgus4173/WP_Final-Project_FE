@@ -619,6 +619,17 @@ input, textarea { font-family: inherit; }
   color: var(--text);
 }
 
+/* Board list: read-only heart + score (vote happens on the post detail page) */
+.scoreCol {
+  min-width: 40px;
+  padding-top: 2px;
+}
+.scoreHeart {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--danger);
+}
+
 .postMeta {
   display: flex;
   align-items: center;

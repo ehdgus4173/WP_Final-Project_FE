@@ -1243,9 +1243,8 @@ button:disabled,
   .pageHero h1  { font-size: 34px; letter-spacing: -1px; }
   .pageHero .subhead { font-size: 14px; }
 
-  .archiveRow   { grid-template-columns: 1fr; gap: 4px; margin: 0; padding: 16px 0; }
+  .archiveRow   { grid-template-columns: 1fr; gap: 4px; }
   .archiveRowCount { display: none; }
-  .archiveRowTitle { white-space: normal; }
 
   .writeGrid    { margin: 32px auto; padding: 0 18px; }
   .authGrid     { margin: 40px auto; padding: 0 18px; }
@@ -1413,3 +1412,53 @@ button:disabled,
   margin: 16px 0;
 }
 
+/* ─── Word break: prevent long strings from breaking layout ── */
+/* Applies on every viewport — content like `1111111111...` or long URLs */
+
+.postDetailTitle,
+.postDetailBody,
+.commentBody,
+.archiveRowTitle,
+.archiveRowSummary,
+.postRowTitle,
+.postRowSnippet,
+.issueTitle,
+.issueDescription {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.postDetailContainer,
+.commentItem,
+.inlineReplyForm,
+.archiveRow,
+.postRow,
+.issueHeader {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
+
+/* Block accidental horizontal scroll at the root */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* ─── Footer mobile: stack contact below copyright ──── */
+@media (max-width: 700px) {
+  .footerBottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 16px 18px;
+  }
+
+  .footerContact {
+    position: static;
+    display: block;
+    margin-top: 0;
+  }
+}

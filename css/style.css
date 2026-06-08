@@ -1464,59 +1464,69 @@ html, body {
   }
 }
 
-/* ─── Nav: compact mobile layout ─────────────────── */
+/* ─── Nav: tight single-line layout on mobile ───── */
 @media (max-width: 700px) {
   .siteNav {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px 12px;
+    flex-wrap: nowrap;        
+    gap: 6px;
+    padding: 8px 10px;
+    min-width: 0;             
   }
   
   .siteLogo {
-    font-size: 16px;
+    font-size: 14px;
+    flex-shrink: 0;           
   }
   
   .navMenu {
-    gap: 8px;
-    font-size: 14px;
-  }
-  
-  .navSpacer {
-    flex: 1 1 0;
-  }
-  
-  .navRight {
     gap: 6px;
     font-size: 13px;
     flex-shrink: 0;
   }
   
-  /* Username 숨김 (이미 있으면 중복 OK) */
+  .navMenu a {
+    padding: 4px 8px;
+  }
+  
+  .navSpacer {
+    flex: 1 1 0;
+    min-width: 0;             
+  }
+  
+  .navRight {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  
+  
   .navRight span {
     display: none;
   }
   
-  /* Avatar 약간 작게 */
+  /* Avatar 작게 */
   .navRight .avatar.sm {
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
   }
   
-  /* Log out 버튼 작게 */
-  .navRight .ghostBtn {
-    padding: 6px 10px;
-    font-size: 13px;
+  
+  .navRight .ghostBtn,
+  .navRight .primaryBtn {
+    padding: 5px 8px;
+    font-size: 12px;
   }
 }
 
-/* 더 좁은 화면 (480px 이하) */
-@media (max-width: 480px) {
+
+@media (max-width: 380px) {
   .siteLogo {
-    font-size: 14px;
-  }
-  
-  .navMenu {
     font-size: 13px;
+  }
+  .navMenu {
+    font-size: 12px;
+  }
+  .navMenu a {
+    padding: 3px 6px;
   }
 }

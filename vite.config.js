@@ -16,7 +16,8 @@ export default defineConfig({
         post: resolve(__dirname, 'post.html'),
         write: resolve(__dirname, 'write.html'),
         admin: resolve(__dirname, 'admin.html'),
-        callback: resolve(__dirname, 'callback.html')
+        callback: resolve(__dirname, 'callback.html'),
+        mypage: resolve(__dirname, 'mypage.html')
       },
     },
   },

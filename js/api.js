@@ -40,6 +40,13 @@ const API = {
   me       : () =>
     apiFetch('/auth/me'),
 
+  // MyPage: 프로필 수정(username/description) 및 최근 게시물 조회
+  updateMe : (fields) =>
+    apiFetch('/auth/me', { method: 'PATCH', body: fields }),
+
+  myPosts  : (limit = 3) =>
+    apiFetch(`/auth/me/posts?limit=${limit}`),
+
   // ── OAuth (social login) ──────────────────────────
   // 1단계: Supabase access_token으로 신원 확인.
   // 응답: 기존 유저면 {token, user}, 신규 유저면 {needs_username: true}

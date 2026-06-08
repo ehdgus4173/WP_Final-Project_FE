@@ -22,14 +22,21 @@ if (!user) {
 
 // ─── State ───────────────────────────────────────────
 let pendingIssues = [];
+let todayPublished = false;
+let regenerating = false;
 
 // ─── Load pending issues ─────────────────────────────
 async function loadPending() {
-  if (!user || user.role !== 'admin') return;  // guarded
+  if (!user || user.role !== 'admin') return;
 
   try {
-    const data = await API.adminGetPendingIssues();
-    pendingIssues = data.issues || [];
+    const [pendingData, homeData] = await Promise.all([
+      API.adminGetPendingIssues(),
+      API.getHome(),
+    ]);
+    pendingIssues = pendingData.issues || [];
+    todayPublished = !!homeData.today_issue;
+
     renderTodayStatus();
     renderCandidates();
   } catch (err) {
@@ -43,15 +50,17 @@ function renderTodayStatus() {
   const statusEl = document.getElementById('todayStatus');
   const subEl = document.getElementById('todayStatusSub');
 
-  if (pendingIssues.length === 0) {
+  if (todayPublished) {
+    statusEl.textContent = "Today's issue is already published";
+    subEl.textContent = 'Approve is disabled — only one issue can be published per day. Pending candidates remain available for review.';
+  } else if (pendingIssues.length === 0) {
     statusEl.textContent = 'No pending issues';
-    subEl.textContent = 'All issues are already reviewed.';
+    subEl.textContent = 'Click Regenerate to fetch new AI candidates.';
   } else {
     statusEl.textContent = `${pendingIssues.length} issue${pendingIssues.length === 1 ? '' : 's'} awaiting review`;
     subEl.textContent = 'Approve a pending candidate to publish it as today\'s issue.';
   }
 }
-
 // ─── Render candidate cards ──────────────────────────
 function renderCandidates() {
   const listEl = document.getElementById('candidateList');
@@ -75,7 +84,11 @@ function renderCandidates() {
       ` : ''}
       <div class="candidateActions">
         <button class="dangerBtn" onclick="handleReject(${issue.id})">Reject</button>
-        <button class="accentBtn" onclick="handleApprove(${issue.id})">Approve & Publish</button>
+        <button class="accentBtn" 
+            onclick="handleApprove(${issue.id})"
+            ${todayPublished ? 'disabled title="Today\'s issue is already published"' : ''}>
+          Approve & Publish
+        </button>
       </div>
     </div>
   `).join('');
@@ -106,6 +119,38 @@ async function handleReject(issueId) {
   } catch (err) {
     console.error(err);
     handleAdminError(err);
+  }
+}
+// ─── Regenerate AI issues ───────────────────────────
+async function handleRegenerate() {
+  if (regenerating) return;
+
+  const force = todayPublished
+    ? confirm("Today's issue is already published. Force a new generation anyway? (Won't replace today's published issue, but adds new pending candidates.)")
+    : confirm('Generate new AI issue candidates? This may take 10-20 seconds.');
+
+  if (!force) return;
+
+  regenerating = true;
+  const btn = document.getElementById('regenerateBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+
+  try {
+    const result = await API.adminRegenerateIssues(true);
+    showToast(result.status === 'success'
+      ? 'New candidate generated'
+      : 'Generation completed (skipped — already exists)');
+
+    // Reload to show new candidates
+    await loadPending();
+  } catch (err) {
+    console.error(err);
+    handleAdminError(err);
+  } finally {
+    regenerating = false;
+    btn.disabled = false;
+    btn.textContent = '🔄 Regenerate';
   }
 }
 
@@ -141,7 +186,9 @@ function handleAdminError(err) {
     showToast('Issue not found (may have been deleted)');
   } else if (code === 'ALREADY_PUBLISHED' || msg.includes('ALREADY_PUBLISHED')) {
     showToast('Already published');
-  } else {
+  }else if (code === 'GENERATION_FAILED' || msg.includes('GENERATION_FAILED')) {
+    showToast('AI generation failed. Try again later.'); 
+  }else {
     showToast('Action failed. Please try again.');
   }
 }

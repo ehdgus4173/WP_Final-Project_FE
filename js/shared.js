@@ -127,7 +127,7 @@ function renderFooter(container) {
         <div class="footerCol">
           <h4 class="footerHeading">Course</h4>
           <p class="footerText">
-            ITM519 Web Programming<br>
+            Web Programming<br>
             SeoulTech
           </p>
         </div>

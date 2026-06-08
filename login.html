@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Log In · What'sToday</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.__API_BASE__       = '%VITE_API_URL%';
+    window.__SUPABASE_URL__   = '%VITE_SUPABASE_URL%';
+    window.__SUPABASE_ANON_KEY__ = '%VITE_SUPABASE_ANON_KEY%';
+  </script>
   <script>window.__API_BASE__ = '%VITE_API_URL%';</script>
 </head>
 <body>
@@ -31,6 +37,12 @@
           <button class="accentBtn" id="loginBtn">Log In</button>
         </div>
 
+        <div class="oauthDivider">or</div>
+        <div class="oauthButtons">
+          <button class="outlineBtn" id="googleBtn">Continue with Google</button>
+          <button class="outlineBtn" id="githubBtn">Continue with GitHub</button>
+        </div>
+
         <p style="margin-top:16px;font-size:14px;color:var(--text-light)">
           Don't have an account? <a href="register.html" style="color:var(--accent)">Sign up</a>
         </p>
@@ -43,6 +55,7 @@
   <!-- 로드 순서 중요: api.js → shared.js → 페이지 JS -->
   <script src="js/api.js"></script>
   <script src="js/shared.js"></script>
+  <script src="js/supabaseClient.js"></script>
   <script src="js/login.js"></script>
 </body>
 </html>

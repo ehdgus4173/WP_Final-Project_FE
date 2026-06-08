@@ -127,8 +127,8 @@ input, textarea { font-family: inherit; }
 .footerInner {
   max-width: 1100px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  justify-content: space-between;
   gap: 32px;
   margin-bottom: 32px;
 }
@@ -999,13 +999,28 @@ button:disabled,
   cursor: not-allowed;
 }
 
-/* ─── Clickable nickname ─── */
+/* ─── Clickable nickname → opens MyPage ─── */
 .commentAuthor {
   cursor: pointer;
 }
 .commentAuthor:hover {
   color: var(--accent);
   text-decoration: underline;
+}
+
+/* Post author name (post detail) → opens MyPage */
+.authorLink {
+  font-weight: 700;
+  cursor: pointer;
+}
+.authorLink:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Comment body click → tags the author */
+.commentBody {
+  cursor: pointer;
 }
 
 /* ─── @mention link inside comment body ─── */

@@ -52,6 +52,14 @@ function renderIssue(issue) {
       <span class="issueDate">${formatDate(issue.created_at)}</span>
       <h1 class="issueTitle">${escapeHTML(issue.title)}</h1>
       <p class="issueDescription">${escapeHTML(issue.summary || '')}</p>
+      ${issue.source_url ? `
+        <a href="${escapeHTML(issue.source_url)}" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="candidateSource">
+          🔗 Source
+        </a>
+      ` : ''}
     </div>
   `;
 }

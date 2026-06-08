@@ -1246,7 +1246,6 @@ button:disabled,
   .archiveRow   { grid-template-columns: 1fr; gap: 4px; margin: 0; padding: 16px 0; }
   .archiveRowCount { display: none; }
   .archiveRowTitle { white-space: normal; }
-  .archiveRowSummary { -webkit-line-clamp: unset; max-height: none; }
 
   .writeGrid    { margin: 32px auto; padding: 0 18px; }
   .authGrid     { margin: 40px auto; padding: 0 18px; }

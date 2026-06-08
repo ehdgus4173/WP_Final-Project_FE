@@ -362,8 +362,9 @@ function fillTopCommentBox(username) {
 }
 
 // Mention click: scroll to + briefly highlight the mentioned user's comment.
-//  - mention inside a reply  → that user's most recent reply within the SAME
-//    parent thread (falls back to the parent comment if they only authored it)
+//  - mention inside a reply  → that user's closest reply ABOVE the clicked one,
+//    within the SAME parent thread (i.e. their most recent reply before this
+//    one). Falls back to the parent comment if they only authored that.
 //  - mention inside a parent → that user's first comment in the whole list
 function handleMentionClick(username, sourceEl) {
   const listEl = document.getElementById('commentList');
@@ -376,15 +377,23 @@ function handleMentionClick(username, sourceEl) {
     const parentId = sourceEl.dataset.parentId;
 
     if (parentId) {
-      // Replies of this parent authored by the mentioned user, in DOM order.
+      // All replies of this parent, in display order.
       const replies = [...listEl.querySelectorAll('.commentItem.reply')]
-        .filter(el => el.dataset.parentId === parentId && el.dataset.username === username);
+        .filter(el => el.dataset.parentId === parentId);
 
-      // Most recent = last in the list.
-      if (replies.length) {
-        target = replies[replies.length - 1];
-      } else {
-        // No reply by them here — fall back to the parent if they wrote it.
+      const clickedIndex = replies.indexOf(sourceEl);
+
+      // Walk upward from just above the clicked reply; the first match is that
+      // user's most recent reply that comes before the one clicked.
+      for (let i = clickedIndex - 1; i >= 0; i--) {
+        if (replies[i].dataset.username === username) {
+          target = replies[i];
+          break;
+        }
+      }
+
+      // No earlier reply by them — fall back to the parent if they wrote it.
+      if (!target) {
         const parentEl = listEl.querySelector(`.commentItem[data-comment-id="${parentId}"]`);
         if (parentEl && parentEl.dataset.username === username) target = parentEl;
       }

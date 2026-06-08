@@ -127,8 +127,8 @@ input, textarea { font-family: inherit; }
 .footerInner {
   max-width: 1100px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  justify-content: space-between;
   gap: 32px;
   margin-bottom: 32px;
 }

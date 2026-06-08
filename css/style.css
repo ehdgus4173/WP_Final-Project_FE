@@ -1243,8 +1243,9 @@ button:disabled,
   .pageHero h1  { font-size: 34px; letter-spacing: -1px; }
   .pageHero .subhead { font-size: 14px; }
 
-  .archiveRow   { grid-template-columns: 1fr; gap: 4px; }
+  .archiveRow   { grid-template-columns: 1fr; gap: 4px; margin: 0; padding: 16px 0; }
   .archiveRowCount { display: none; }
+  .archiveRowTitle { white-space: normal; }
 
   .writeGrid    { margin: 32px auto; padding: 0 18px; }
   .authGrid     { margin: 40px auto; padding: 0 18px; }
@@ -1411,3 +1412,4 @@ button:disabled,
   font-size: 13px;
   margin: 16px 0;
 }
+

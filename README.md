@@ -167,7 +167,9 @@ Both `main` and `develop` are protected — direct pushes are rejected; every ch
 ## AI Usage Disclosure
 
 Per course policy, this project used AI assistants during development:
-- **Claude (Anthropic)** — code generation, debugging, code review, documentation drafting
+- **Claude (Anthropic)** — code generation, debugging, documentation drafting
 - **Google Gemini** — runtime use only (daily issue generation in production)
 
-All AI-generated code was reviewed and modified by team members before commit. Team members are individually responsible for understanding and being able to explain any code attributed to them.
+## License
+
+MIT License — see [LICENSE](./LICENSE) for details.

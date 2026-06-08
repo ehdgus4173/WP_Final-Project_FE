@@ -22,14 +22,21 @@ if (!user) {
 
 // ─── State ───────────────────────────────────────────
 let pendingIssues = [];
+let todayPublished = false;
 
 // ─── Load pending issues ─────────────────────────────
 async function loadPending() {
   if (!user || user.role !== 'admin') return;  // guarded
 
   try {
-    const data = await API.adminGetPendingIssues();
-    pendingIssues = data.issues || [];
+    // Parallel fetch: pending issues + today's published status
+    const [pendingData, homeData] = await Promise.all([
+      API.adminGetPendingIssues(),
+      API.getHome(),
+    ]);
+    pendingIssues = pendingData.issues || [];
+    todayPublished = !!homeData.today_issue;
+
     renderTodayStatus();
     renderCandidates();
   } catch (err) {
@@ -43,7 +50,10 @@ function renderTodayStatus() {
   const statusEl = document.getElementById('todayStatus');
   const subEl = document.getElementById('todayStatusSub');
 
-  if (pendingIssues.length === 0) {
+  if (todayPublished) {
+    statusEl.textContent = "Today's issue is already published";
+    subEl.textContent = 'Approve is disabled — only one issue can be published per day. Pending candidates remain available for review.';
+  } else if (pendingIssues.length === 0) {
     statusEl.textContent = 'No pending issues';
     subEl.textContent = 'All issues are already reviewed.';
   } else {
@@ -51,7 +61,6 @@ function renderTodayStatus() {
     subEl.textContent = 'Approve a pending candidate to publish it as today\'s issue.';
   }
 }
-
 // ─── Render candidate cards ──────────────────────────
 function renderCandidates() {
   const listEl = document.getElementById('candidateList');
@@ -75,7 +84,11 @@ function renderCandidates() {
       ` : ''}
       <div class="candidateActions">
         <button class="dangerBtn" onclick="handleReject(${issue.id})">Reject</button>
-        <button class="accentBtn" onclick="handleApprove(${issue.id})">Approve & Publish</button>
+        <button class="accentBtn" 
+            onclick="handleApprove(${issue.id})"
+            ${todayPublished ? 'disabled title="Today\'s issue is already published"' : ''}>
+          Approve & Publish
+        </button>
       </div>
     </div>
   `).join('');

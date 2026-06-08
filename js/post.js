@@ -263,29 +263,69 @@ function handleReply(parentId, username) {
     return;
   }
 
-  const input = document.getElementById('commentInput');
-  const indicator = document.getElementById('replyIndicator');
-  const replyToEl = document.getElementById('replyToUsername');
+  const existing = document.querySelector('.inlineReplyForm');
+  if (existing) existing.remove();
 
-  if (!input) return;  // form not rendered (e.g. logged out)
+  const parentEl = document.querySelector(`[data-comment-id="${parentId}"]`);
+  if (!parentEl) return;
 
-  // Track parent on the textarea itself
-  input.dataset.replyTo = parentId;
+  const formHTML = `
+    <div class="inlineReplyForm" data-parent-id="${parentId}">
+      <div class="inlineReplyHeader">
+        Replying to <strong>@${escapeHTML(username)}</strong>
+        <button type="button" class="cancelReplyBtn" onclick="cancelInlineReply()">× cancel</button>
+      </div>
+      <textarea class="inlineReplyInput"
+                placeholder="Write your reply…"
+                rows="2"
+                maxlength="1000"></textarea>
+      <button type="button" class="accentBtn smallBtn" onclick="submitInlineReply(${parentId})">Post reply</button>
+    </div>
+  `;
 
-  // Prefill mention prefix
-  input.value = `@${username} `;
+  parentEl.insertAdjacentHTML('afterend', formHTML);
 
-  // Show indicator
-  replyToEl.textContent = `@${username}`;
-  indicator.style.display = 'flex';
+  const newForm = document.querySelector('.inlineReplyForm');
+  const textarea = newForm.querySelector('.inlineReplyInput');
+  textarea.focus();
 
-  // Scroll to form + focus
-  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setTimeout(() => {
-    input.focus();
-    // Place cursor at end
-    input.setSelectionRange(input.value.length, input.value.length);
-  }, 300);
+  newForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelInlineReply() {
+  const form = document.querySelector('.inlineReplyForm');
+  if (form) form.remove();
+}
+
+async function submitInlineReply(parentId) {
+  const form = document.querySelector('.inlineReplyForm');
+  if (!form) return;
+
+  const textarea = form.querySelector('.inlineReplyInput');
+  const submitBtn = form.querySelector('button.accentBtn');
+  const content = textarea.value.trim();
+
+  if (content.length < 2) {
+    showToast('Reply is too short (min 2 characters)');
+    return;
+  }
+  if (content.length > 1000) {
+    showToast('Reply is too long (max 1000 characters)');
+    return;
+  }
+
+  submitBtn.disabled = true;
+
+  try {
+    const newComment = await API.createComment(postId, content, parentId);
+    form.remove();
+    appendNewComment(newComment);
+    showToast('Reply posted');
+  } catch (err) {
+    console.error(err);
+    handleCommentError(err);
+    submitBtn.disabled = false;
+  }
 }
 
 function cancelReply() {

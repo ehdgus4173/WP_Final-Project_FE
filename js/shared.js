@@ -62,21 +62,25 @@ function renderNav({ activePage = 'home', container }) {
 
   const authHTML = user
     ? `<div class="avatar sm">${escapeHTML((user.username || user.email)[0].toUpperCase())}</div>
-       <span style="font-size:14px;font-weight:500">${escapeHTML(user.username || user.email)}</span>
+       <span style="font-weight:500">${escapeHTML(user.username || user.email)}</span>
        <button class="ghostBtn" onclick="handleLogout()">Log out</button>`
     : `<a href="login.html" class="ghostBtn">Log in</a>
        <a href="register.html" class="primaryBtn">Sign up</a>`;
 
-  const adminLink = user && user.role === 'admin'
-    ? `<a href="admin.html" class="${activePage === 'admin' ? 'active' : ''}">Admin</a>`
-    : '';
+  // Admins see Admin; other logged-in users see MyPage in the same slot.
+  let sectionLink = '';
+  if (user && user.role === 'admin') {
+    sectionLink = `<a href="admin.html" class="${activePage === 'admin' ? 'active' : ''}">Admin</a>`;
+  } else if (user) {
+    sectionLink = `<a href="mypage.html" class="${activePage === 'mypage' ? 'active' : ''}">MyPage</a>`;
+  }
 
   container.innerHTML = `
     <header class="siteNav">
       <a href="index.html" class="siteLogo">What'sToday</a>
       <nav class="navMenu">
         <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
-        ${adminLink}
+        ${sectionLink}
       </nav>
       <span class="navSpacer"></span>
       <div class="navRight">

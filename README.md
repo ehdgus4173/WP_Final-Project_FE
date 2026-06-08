@@ -171,7 +171,3 @@ Per course policy, this project used AI assistants during development:
 - **Google Gemini** — runtime use only (daily issue generation in production)
 
 All AI-generated code was reviewed and modified by team members before commit. Team members are individually responsible for understanding and being able to explain any code attributed to them.
-
-## License
-
-This project is academic coursework and not licensed for redistribution.

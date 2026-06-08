@@ -66,6 +66,7 @@ Every day an AI selects one trending issue, an admin reviews and publishes it, a
 | `register.html` | `/register.html` | Account creation |
 | `callback.html` | `/callback.html` | OAuth callback handler (Google / GitHub) |
 | `admin.html` | `/admin.html` | Admin-only — review pending AI candidates |
+| `mypage.html` | `/mypage.html` | User profile — edit own info & recent posts; read-only for others (`?id=:userId`) |
 
 ## Getting Started
 

@@ -40,6 +40,19 @@ const API = {
   me       : () =>
     apiFetch('/auth/me'),
 
+  // ── OAuth (social login) ──────────────────────────
+  // 1단계: Supabase access_token으로 신원 확인.
+  // 응답: 기존 유저면 {token, user}, 신규 유저면 {needs_username: true}
+  oauthLogin : (accessToken) =>
+    apiFetch('/auth/oauth', { method: 'POST', body: { access_token: accessToken } }),
+
+  // 2단계: 신규 유저가 username 정하면 가입 완료. 응답: {token, user}
+  oauthRegister : (accessToken, username) =>
+    apiFetch('/auth/oauth/register', {
+      method: 'POST',
+      body: { access_token: accessToken, username },
+    }),
+
   // ── Home ──────────────────────────────────────────
   getHome  : () =>
     apiFetch('/home'),

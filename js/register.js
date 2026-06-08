@@ -44,8 +44,7 @@ async function handleRegister() {
     }, 800);
   } catch (err) {
     // 명세 에러: 400 VALIDATION_ERROR / 409 EMAIL_TAKEN / 409 USERNAME_TAKEN
-    const detailMsg = err.details?.[0]?.message;
-    showError(detailMsg || err.message || 'Could not create account. Please try again.');
+    showError(err.message || 'Could not create account. Please try again.');
     registerBtn.disabled = false;
   }
 }

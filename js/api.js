@@ -23,7 +23,6 @@ async function apiFetch(path, options = {}) {
   const error = new Error(data.error?.message || data.message || `Error ${res.status}`);
   error.code = data.error?.code;
   error.status = res.status;
-  error.details = data.error?.details;
   throw error;
 }
   return data.data !== undefined ? data.data : data;

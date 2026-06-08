@@ -4,7 +4,6 @@ A daily-news discussion platform powered by AI-curated topics.
 Every day an AI selects one trending issue, an admin reviews and publishes it, and users post opinions, vote, and discuss in threaded comments.
 
 
-[![CI](https://github.com/ehdgus4173/WP_Final-Project_FE/actions/workflows/ci.yml/badge.svg)](https://github.com/ehdgus4173/WP_Final-Project_FE/actions/workflows/ci.yml)
 
 ## Live Demo
 
@@ -168,11 +167,9 @@ Both `main` and `develop` are protected — direct pushes are rejected; every ch
 ## AI Usage Disclosure
 
 Per course policy, this project used AI assistants during development:
-- **Claude (Anthropic)** — code generation, debugging, code review, documentation drafting
+- **Claude (Anthropic)** — code generation, debugging, documentation drafting
 - **Google Gemini** — runtime use only (daily issue generation in production)
-
-All AI-generated code was reviewed and modified by team members before commit. Team members are individually responsible for understanding and being able to explain any code attributed to them.
 
 ## License
 
-This project is academic coursework and not licensed for redistribution.
+MIT License — see [LICENSE](./LICENSE) for details.

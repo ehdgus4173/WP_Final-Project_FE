@@ -59,6 +59,10 @@ function renderPost(post) {
 
   const username = post.author?.username || 'Unknown';
   const initial = username[0].toUpperCase();
+  const authorId = post.author?.id;
+  const authorNameHTML = authorId
+    ? `<a class="authorLink" href="mypage.html?id=${authorId}">${escapeHTML(username)}</a>`
+    : `<strong>${escapeHTML(username)}</strong>`;
 
   const userVote = post.user_vote ?? 0;  // 1, -1, or 0
   const upActive   = userVote === 1  ? 'active' : '';
@@ -67,7 +71,7 @@ function renderPost(post) {
   el.innerHTML = `
     <div class="postDetailMeta">
       <div class="avatar sm">${escapeHTML(initial)}</div>
-      <strong>${escapeHTML(username)}</strong>
+      ${authorNameHTML}
       <span>·</span>
       <span>${formatDate(post.created_at)}</span>
       ${post.updated_at ? '<span class="tag" style="font-size:11px">edited</span>' : ''}
@@ -170,6 +174,7 @@ function renderCommentHTML(comment, isReply = false) {
     <div class="commentItem ${isReply ? 'reply' : ''}" data-comment-id="${comment.id}" data-username="${escapeHTML(username)}" data-parent-id="${parentAttr}">
       <div class="commentMeta">
         <strong class="commentAuthor"
+                data-user-id="${comment.author?.id ?? ''}"
                 data-username="${escapeHTML(username)}"
                 data-is-reply="${isReply ? '1' : '0'}"
                 data-parent-id="${parentAttr}">${escapeHTML(username)}</strong>
@@ -315,28 +320,46 @@ function setupCommentListDelegation() {
   listEl.dataset.delegated = '1';
 
   listEl.addEventListener('click', (e) => {
-    const author = e.target.closest('.commentAuthor');
-    if (author) {
-      handleAuthorClick(author);
-      return;
-    }
+    // 1) @mention link inside the body → scroll/highlight (it lives inside .commentBody,
+    //    so check it before the body handler).
     const mention = e.target.closest('.mention');
     if (mention) {
       e.preventDefault();
       handleMentionClick(mention.dataset.username, mention.closest('.commentItem'));
+      return;
+    }
+
+    // 2) nickname → open that user's MyPage
+    const author = e.target.closest('.commentAuthor');
+    if (author) {
+      openUserPage(author.dataset.userId);
+      return;
+    }
+
+    // 3) comment body → tag that comment's author (reply form / top box mention)
+    const body = e.target.closest('.commentBody');
+    if (body) {
+      tagFromComment(body.closest('.commentItem'));
     }
   });
 }
 
-// Feature 1 + 2: clicking a nickname.
-//  - reply nickname  → open inline reply on its parent, pre-filled "@name "
-//  - parent nickname → fill the top comment box with "@name "
-function handleAuthorClick(el) {
-  const username = el.dataset.username;
-  const isReply = el.dataset.isReply === '1';
+// Nickname click → that user's MyPage.
+function openUserPage(userId) {
+  if (!userId) return;
+  window.location.href = `mypage.html?id=${userId}`;
+}
+
+// Comment-body click → tag the comment's author.
+//  - reply body  → open inline reply on its parent, pre-filled "@name "
+//  - parent body → fill the top comment box with "@name "
+function tagFromComment(itemEl) {
+  if (!itemEl) return;
+  const username = itemEl.dataset.username;
+  const isReply = itemEl.classList.contains('reply');
 
   if (isReply) {
-    const parentId = parseInt(el.dataset.parentId);
+    const parentId = parseInt(itemEl.dataset.parentId);
     if (!Number.isNaN(parentId)) handleReply(parentId, username, username);
   } else {
     fillTopCommentBox(username);

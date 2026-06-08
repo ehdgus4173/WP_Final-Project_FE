@@ -47,6 +47,13 @@ const API = {
   myPosts  : (limit = 3) =>
     apiFetch(`/auth/me/posts?limit=${limit}`),
 
+  // 다른 사용자 공개 프로필(읽기전용) 및 그 사용자의 최근 게시물
+  getUser      : (id) =>
+    apiFetch(`/users/${id}`),
+
+  getUserPosts : (id, limit = 3) =>
+    apiFetch(`/users/${id}/posts?limit=${limit}`),
+
   // ── OAuth (social login) ──────────────────────────
   // 1단계: Supabase access_token으로 신원 확인.
   // 응답: 기존 유저면 {token, user}, 신규 유저면 {needs_username: true}

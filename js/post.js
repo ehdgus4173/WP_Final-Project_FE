@@ -257,18 +257,23 @@ async function handleCommentLike(commentId, btn) {
   }
 }
 
+
+
 function handleReply(parentId, username) {
   if (!Auth.isLoggedIn()) {
     window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
     return;
   }
 
+  // 기존 인라인 폼 있으면 제거 (한 번에 하나만 열림)
   const existing = document.querySelector('.inlineReplyForm');
   if (existing) existing.remove();
 
+  // 부모 댓글 찾기
   const parentEl = document.querySelector(`[data-comment-id="${parentId}"]`);
   if (!parentEl) return;
 
+  // 인라인 폼 HTML
   const formHTML = `
     <div class="inlineReplyForm" data-parent-id="${parentId}">
       <div class="inlineReplyHeader">
@@ -283,12 +288,13 @@ function handleReply(parentId, username) {
     </div>
   `;
 
+  // 부모 댓글 바로 아래 (대댓글들 위)에 삽입
   parentEl.insertAdjacentHTML('afterend', formHTML);
 
+  // 포커스 + 스크롤
   const newForm = document.querySelector('.inlineReplyForm');
   const textarea = newForm.querySelector('.inlineReplyInput');
   textarea.focus();
-
   newForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -328,15 +334,6 @@ async function submitInlineReply(parentId) {
   }
 }
 
-function cancelReply() {
-  const input = document.getElementById('commentInput');
-  const indicator = document.getElementById('replyIndicator');
-
-  delete input.dataset.replyTo;
-  input.value = '';
-  indicator.style.display = 'none';
-}
-
 // ─── Setup comment write form ────────────────────────
 function setupCommentForm() {
   const container = document.getElementById('commentFormContainer');
@@ -353,10 +350,6 @@ function setupCommentForm() {
 
   container.innerHTML = `
     <form id="commentForm" class="commentForm">
-      <div id="replyIndicator" class="replyIndicator" style="display:none">
-        <span>Replying to <strong id="replyToUsername"></strong></span>
-        <button type="button" class="cancelReplyBtn" onclick="cancelReply()">× cancel</button>
-      </div>
       <textarea id="commentInput"
                 placeholder="Add a comment…"
                 rows="3"
@@ -387,15 +380,11 @@ async function handleCommentSubmit(e) {
   const submitBtn = e.target.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
 
-  const parentId = input.dataset.replyTo ? parseInt(input.dataset.replyTo) : null;
-
   try {
-    const newComment = await API.createComment(postId, content, parentId);
+    const newComment = await API.createComment(postId, content);
     appendNewComment(newComment);
     input.value = '';
-    delete input.dataset.replyTo;
-    document.getElementById('replyIndicator').style.display = 'none';
-    showToast(parentId ? 'Reply posted' : 'Comment posted');
+    showToast('Comment posted');
   } catch (err) {
     console.error(err);
     handleCommentError(err);
@@ -403,7 +392,6 @@ async function handleCommentSubmit(e) {
     submitBtn.disabled = false;
   }
 }
-
 // ─── Append new comment to DOM ──────────────────────
 function appendNewComment(comment) {
   const listEl = document.getElementById('commentList');

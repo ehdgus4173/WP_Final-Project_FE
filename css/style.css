@@ -832,8 +832,7 @@ input, textarea { font-family: inherit; }
   padding: 12px;
   margin-bottom: 16px;
   background: var(--surface);
-  border-left: 2px solid var(--accent);
-  border-radius: var(--radius-sm);
+  border-radius: 5px;
 }
 
 .inlineReplyHeader {

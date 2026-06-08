@@ -167,7 +167,7 @@ function renderCommentHTML(comment, isReply = false) {
   const parentAttr = comment.parent_id != null ? comment.parent_id : '';
 
   return `
-    <div class="commentItem ${isReply ? 'reply' : ''}" data-comment-id="${comment.id}" data-username="${escapeHTML(username)}">
+    <div class="commentItem ${isReply ? 'reply' : ''}" data-comment-id="${comment.id}" data-username="${escapeHTML(username)}" data-parent-id="${parentAttr}">
       <div class="commentMeta">
         <strong class="commentAuthor"
                 data-username="${escapeHTML(username)}"
@@ -323,7 +323,7 @@ function setupCommentListDelegation() {
     const mention = e.target.closest('.mention');
     if (mention) {
       e.preventDefault();
-      handleMentionClick(mention.dataset.username);
+      handleMentionClick(mention.dataset.username, mention.closest('.commentItem'));
     }
   });
 }
@@ -361,13 +361,41 @@ function fillTopCommentBox(username) {
   input.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// Mention click: scroll to + briefly highlight that user's first comment in the thread.
-function handleMentionClick(username) {
+// Mention click: scroll to + briefly highlight the mentioned user's comment.
+//  - mention inside a reply  → that user's most recent reply within the SAME
+//    parent thread (falls back to the parent comment if they only authored it)
+//  - mention inside a parent → that user's first comment in the whole list
+function handleMentionClick(username, sourceEl) {
   const listEl = document.getElementById('commentList');
   if (!listEl) return;
 
-  const target = [...listEl.querySelectorAll('.commentItem')]
-    .find(el => el.dataset.username === username);
+  let target = null;
+
+  // If the mention was clicked inside a reply, stay within that parent's thread.
+  if (sourceEl && sourceEl.classList.contains('reply')) {
+    const parentId = sourceEl.dataset.parentId;
+
+    if (parentId) {
+      // Replies of this parent authored by the mentioned user, in DOM order.
+      const replies = [...listEl.querySelectorAll('.commentItem.reply')]
+        .filter(el => el.dataset.parentId === parentId && el.dataset.username === username);
+
+      // Most recent = last in the list.
+      if (replies.length) {
+        target = replies[replies.length - 1];
+      } else {
+        // No reply by them here — fall back to the parent if they wrote it.
+        const parentEl = listEl.querySelector(`.commentItem[data-comment-id="${parentId}"]`);
+        if (parentEl && parentEl.dataset.username === username) target = parentEl;
+      }
+    }
+  }
+
+  // Default / fallback: first comment in the whole list by that user.
+  if (!target) {
+    target = [...listEl.querySelectorAll('.commentItem')]
+      .find(el => el.dataset.username === username) || null;
+  }
 
   if (!target) {
     showToast(`@${username} is not in this thread`);

@@ -62,3 +62,20 @@ loginBtn.addEventListener('click', handleLogin);
     if (e.key === 'Enter') handleLogin();
   })
 );
+
+// ── 소셜 로그인 ──────────────────────────────────────
+// 버튼 누르면 Supabase가 Google/GitHub로 보냄 → 로그인 후 callback.html로 복귀.
+// next 파라미터는 callback이 받을 수 있게 redirectTo 쿼리로 넘김.
+async function handleOAuth(provider) {
+  const next = new URLSearchParams(window.location.search).get('next');
+  const callbackUrl = `${location.origin}/callback.html${next ? '?next=' + encodeURIComponent(next) : ''}`;
+
+  await sb.auth.signInWithOAuth({
+    provider,                                  // 'google' | 'github'
+    options: { redirectTo: callbackUrl },
+  });
+  // 이 줄 이후 브라우저가 외부로 이동하므로 여기 코드는 사실상 실행 안 됨
+}
+
+document.getElementById('googleBtn').addEventListener('click', () => handleOAuth('google'));
+document.getElementById('githubBtn').addEventListener('click', () => handleOAuth('github'));

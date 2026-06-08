@@ -75,7 +75,7 @@ input, textarea { font-family: inherit; }
 }
 
 .siteLogo {
-  font-size: 20px;
+  font-size: 32px; /* 20px × 1.6 */
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--text);
@@ -90,7 +90,7 @@ input, textarea { font-family: inherit; }
 .navMenu a {
   padding: 8px 14px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 19.6px; /* 14px × 1.4 */
   font-weight: 500;
   color: var(--text-mid);
   transition: background 0.15s, color 0.15s;
@@ -105,6 +105,14 @@ input, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* Nav-only: scale Log in / Log out / Sign up / username to 1.4× (14px → 19.6px),
+   scoped here so buttons elsewhere on the site keep their size. */
+.navRight .ghostBtn,
+.navRight .primaryBtn,
+.navRight span {
+  font-size: 19.6px;
 }
 
 /* ─── Site Footer ────────────────────────────────── */

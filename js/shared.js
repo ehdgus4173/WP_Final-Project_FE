@@ -62,7 +62,7 @@ function renderNav({ activePage = 'home', container }) {
 
   const authHTML = user
     ? `<div class="avatar sm">${escapeHTML((user.username || user.email)[0].toUpperCase())}</div>
-       <span style="font-size:14px;font-weight:500">${escapeHTML(user.username || user.email)}</span>
+       <span style="font-weight:500">${escapeHTML(user.username || user.email)}</span>
        <button class="ghostBtn" onclick="handleLogout()">Log out</button>`
     : `<a href="login.html" class="ghostBtn">Log in</a>
        <a href="register.html" class="primaryBtn">Sign up</a>`;

@@ -1463,3 +1463,60 @@ html, body {
     margin-top: 0;
   }
 }
+
+/* ─── Nav: compact mobile layout ─────────────────── */
+@media (max-width: 700px) {
+  .siteNav {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  
+  .siteLogo {
+    font-size: 16px;
+  }
+  
+  .navMenu {
+    gap: 8px;
+    font-size: 14px;
+  }
+  
+  .navSpacer {
+    flex: 1 1 0;
+  }
+  
+  .navRight {
+    gap: 6px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  
+  /* Username 숨김 (이미 있으면 중복 OK) */
+  .navRight span {
+    display: none;
+  }
+  
+  /* Avatar 약간 작게 */
+  .navRight .avatar.sm {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+  
+  /* Log out 버튼 작게 */
+  .navRight .ghostBtn {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+/* 더 좁은 화면 (480px 이하) */
+@media (max-width: 480px) {
+  .siteLogo {
+    font-size: 14px;
+  }
+  
+  .navMenu {
+    font-size: 13px;
+  }
+}

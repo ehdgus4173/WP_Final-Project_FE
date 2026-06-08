@@ -94,11 +94,47 @@ function handleLogout() {
 
 // ─── Footer ──────────────────────────────────────────
 function renderFooter(container) {
-  if (!container) return;
   container.innerHTML = `
     <footer class="siteFooter">
-      <div class="footInner">
-        <span>© 2026 What'sToday</span>
+      <div class="footerInner">
+        <div class="footerCol">
+          <h4 class="footerHeading">What'sToday</h4>
+          <p class="footerText">
+            AI-curated daily issues.<br>
+            Real conversations.
+          </p>
+        </div>
+
+        <div class="footerCol">
+          <h4 class="footerHeading">Project</h4>
+          <ul class="footerLinks">
+            <li><a href="https://github.com/ehdgus4173/WP_Final-Project_FE" target="_blank" rel="noopener">Frontend Repo</a></li>
+            <li><a href="https://github.com/ehdgus4173/WP_Final-Projcet_BE" target="_blank" rel="noopener">Backend Repo</a></li>
+            <li><a href="https://wp-final-projcet-be.onrender.com/api/docs" target="_blank" rel="noopener">API Docs</a></li>
+          </ul>
+        </div>
+
+        <div class="footerCol">
+          <h4 class="footerHeading">Team</h4>
+          <ul class="footerLinks">
+            <li>Kim Shin-woo</li>
+            <li>Hong Jun-su</li>
+            <li>Lim Dong-hyun</li>
+            <li>Kim Byung-chan</li>
+          </ul>
+        </div>
+
+        <div class="footerCol">
+          <h4 class="footerHeading">Course</h4>
+          <p class="footerText">
+            ITM519 Web Programming<br>
+            SeoulTech
+          </p>
+        </div>
+      </div>
+
+      <div class="footerBottom">
+        © 2026 What'sToday
       </div>
     </footer>
   `;

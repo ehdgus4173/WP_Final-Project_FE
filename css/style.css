@@ -826,6 +826,52 @@ input, textarea { font-family: inherit; }
   justify-content: flex-end;
 }
 
+/* ─── Inline Reply Form ──────────────────────────── */
+.inlineReplyForm {
+  margin-left: 32px;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.inlineReplyHeader {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inlineReplyHeader strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.inlineReplyInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.inlineReplyInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.smallBtn {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
 /*Responsive*/
 @media (max-width: 700px) {
   .container    { padding: 0 18px; }

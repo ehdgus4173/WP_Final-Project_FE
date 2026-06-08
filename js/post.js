@@ -34,6 +34,7 @@ async function loadPost() {
     setupOwnerActions(currentPost);
     renderCommentCount(currentComments.length);
     renderComments(currentComments);
+    setupCommentListDelegation();
     setupCommentForm();
   } catch (err) {
     console.error(err);
@@ -163,15 +164,20 @@ function renderCommentHTML(comment, isReply = false) {
   const likedClass = comment.liked_by_me ? 'active' : '';
   const likeCount = comment.like_count ?? 0;
 
+  const parentAttr = comment.parent_id != null ? comment.parent_id : '';
+
   return `
-    <div class="commentItem ${isReply ? 'reply' : ''}" data-comment-id="${comment.id}">
+    <div class="commentItem ${isReply ? 'reply' : ''}" data-comment-id="${comment.id}" data-username="${escapeHTML(username)}" data-parent-id="${parentAttr}">
       <div class="commentMeta">
-        <strong>${escapeHTML(username)}</strong>
+        <strong class="commentAuthor"
+                data-username="${escapeHTML(username)}"
+                data-is-reply="${isReply ? '1' : '0'}"
+                data-parent-id="${parentAttr}">${escapeHTML(username)}</strong>
         <span>·</span>
         <span>${formatDateShort(comment.created_at)}</span>
         ${canDelete ? `<button class="deleteCommentBtn" onclick="handleDeleteComment(${comment.id})">delete</button>` : ''}
       </div>
-      <div class="commentBody">${escapeHTML(comment.content)}</div>
+      <div class="commentBody">${linkifyMentions(escapeHTML(comment.content))}</div>
       <div class="commentActions">
         <button class="commentLikeBtn ${likedClass}" onclick="handleCommentLike(${comment.id}, this)">
           ♥ <span class="likeCount">${likeCount}</span>
@@ -257,7 +263,10 @@ async function handleCommentLike(commentId, btn) {
   }
 }
 
-function handleReply(parentId, username) {
+// parentId: comment thread the reply attaches to (always a depth-0 parent).
+// username: shown in the "Replying to @…" header.
+// prefillMention: if set, the textarea is pre-filled with "@<name> " (YouTube-style).
+function handleReply(parentId, username, prefillMention) {
   if (!Auth.isLoggedIn()) {
     window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
     return;
@@ -269,6 +278,8 @@ function handleReply(parentId, username) {
   const parentEl = document.querySelector(`[data-comment-id="${parentId}"]`);
   if (!parentEl) return;
 
+  const prefill = prefillMention ? `@${prefillMention} ` : '';
+
   const formHTML = `
     <div class="inlineReplyForm" data-parent-id="${parentId}">
       <div class="inlineReplyHeader">
@@ -278,7 +289,7 @@ function handleReply(parentId, username) {
       <textarea class="inlineReplyInput"
                 placeholder="Write your reply…"
                 rows="2"
-                maxlength="1000"></textarea>
+                maxlength="1000">${escapeHTML(prefill)}</textarea>
       <button type="button" class="accentBtn smallBtn" onclick="submitInlineReply(${parentId})">Post reply</button>
     </div>
   `;
@@ -287,9 +298,274 @@ function handleReply(parentId, username) {
 
   const newForm = document.querySelector('.inlineReplyForm');
   const textarea = newForm.querySelector('.inlineReplyInput');
+  attachMentionAutocomplete(textarea);
   textarea.focus();
+  // Place caret at the end so the user types right after "@name ".
+  const len = textarea.value.length;
+  textarea.setSelectionRange(len, len);
 
   newForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ─── Nickname / @mention click behaviour ─────────────
+// Delegated once on #commentList; survives re-renders since the container persists.
+function setupCommentListDelegation() {
+  const listEl = document.getElementById('commentList');
+  if (!listEl || listEl.dataset.delegated) return;
+  listEl.dataset.delegated = '1';
+
+  listEl.addEventListener('click', (e) => {
+    const author = e.target.closest('.commentAuthor');
+    if (author) {
+      handleAuthorClick(author);
+      return;
+    }
+    const mention = e.target.closest('.mention');
+    if (mention) {
+      e.preventDefault();
+      handleMentionClick(mention.dataset.username, mention.closest('.commentItem'));
+    }
+  });
+}
+
+// Feature 1 + 2: clicking a nickname.
+//  - reply nickname  → open inline reply on its parent, pre-filled "@name "
+//  - parent nickname → fill the top comment box with "@name "
+function handleAuthorClick(el) {
+  const username = el.dataset.username;
+  const isReply = el.dataset.isReply === '1';
+
+  if (isReply) {
+    const parentId = parseInt(el.dataset.parentId);
+    if (!Number.isNaN(parentId)) handleReply(parentId, username, username);
+  } else {
+    fillTopCommentBox(username);
+  }
+}
+
+// Feature 2: append "@name " into the top-level comment box (posts as a top-level comment).
+function fillTopCommentBox(username) {
+  const input = document.getElementById('commentInput');
+  if (!input) return; // not logged in → no top box to fill
+
+  const mention = `@${username} `;
+  if (!input.value.trim()) {
+    input.value = mention;
+  } else {
+    input.value = input.value.replace(/\s*$/, '') + ' ' + mention;
+  }
+
+  input.focus();
+  const len = input.value.length;
+  input.setSelectionRange(len, len);
+  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Mention click: scroll to + briefly highlight the mentioned user's comment.
+//  - mention inside a reply  → that user's closest reply ABOVE the clicked one,
+//    within the SAME parent thread (i.e. their most recent reply before this
+//    one). Falls back to the parent comment if they only authored that.
+//  - mention inside a parent → that user's first comment in the whole list
+function handleMentionClick(username, sourceEl) {
+  const listEl = document.getElementById('commentList');
+  if (!listEl) return;
+
+  let target = null;
+
+  // If the mention was clicked inside a reply, stay within that parent's thread.
+  if (sourceEl && sourceEl.classList.contains('reply')) {
+    const parentId = sourceEl.dataset.parentId;
+
+    if (parentId) {
+      // All replies of this parent, in display order.
+      const replies = [...listEl.querySelectorAll('.commentItem.reply')]
+        .filter(el => el.dataset.parentId === parentId);
+
+      const clickedIndex = replies.indexOf(sourceEl);
+
+      // Walk upward from just above the clicked reply; the first match is that
+      // user's most recent reply that comes before the one clicked.
+      for (let i = clickedIndex - 1; i >= 0; i--) {
+        if (replies[i].dataset.username === username) {
+          target = replies[i];
+          break;
+        }
+      }
+
+      // No earlier reply by them — fall back to the parent if they wrote it.
+      if (!target) {
+        const parentEl = listEl.querySelector(`.commentItem[data-comment-id="${parentId}"]`);
+        if (parentEl && parentEl.dataset.username === username) target = parentEl;
+      }
+    }
+  }
+
+  // Default / fallback: first comment in the whole list by that user.
+  if (!target) {
+    target = [...listEl.querySelectorAll('.commentItem')]
+      .find(el => el.dataset.username === username) || null;
+  }
+
+  if (!target) {
+    showToast(`@${username} is not in this thread`);
+    return;
+  }
+
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  target.classList.add('commentHighlight');
+  setTimeout(() => target.classList.remove('commentHighlight'), 1600);
+}
+
+// Turn "@name" tokens in already-escaped comment text into clickable mention links.
+function linkifyMentions(escapedText) {
+  return escapedText.replace(/@([A-Za-z0-9_]+|[가-힣]+)/g, (full, name) =>
+    `<a class="mention" href="javascript:void(0)" data-username="${name}">@${name}</a>`);
+}
+
+// ─── @mention autocomplete (feature 3) ───────────────
+// Candidates = unique usernames among the current post's comment authors.
+let mentionState = null; // { textarea, tokenStart, matches, activeIndex }
+
+function getMentionCandidates() {
+  const map = new Map(); // lowercased → original casing (dedupe, keep first)
+  currentComments.forEach(c => {
+    const u = c.author?.username;
+    if (u && !map.has(u.toLowerCase())) map.set(u.toLowerCase(), u);
+  });
+  return [...map.values()];
+}
+
+function getMentionDropdown() {
+  let dd = document.getElementById('mentionDropdown');
+  if (!dd) {
+    dd = document.createElement('div');
+    dd.id = 'mentionDropdown';
+    dd.className = 'mentionDropdown';
+    dd.style.display = 'none';
+    document.body.appendChild(dd);
+  }
+  return dd;
+}
+
+function closeMentionDropdown() {
+  const dd = document.getElementById('mentionDropdown');
+  if (dd) dd.style.display = 'none';
+  mentionState = null;
+}
+
+function attachMentionAutocomplete(textarea) {
+  if (textarea.dataset.mentionBound) return;
+  textarea.dataset.mentionBound = '1';
+  textarea.addEventListener('input', () => onMentionInput(textarea));
+  textarea.addEventListener('keydown', (e) => onMentionKeydown(e, textarea));
+  textarea.addEventListener('blur', () => setTimeout(closeMentionDropdown, 150));
+}
+
+function onMentionInput(textarea) {
+  const caret = textarea.selectionStart;
+  const before = textarea.value.slice(0, caret);
+  // The active @token immediately before the caret (letters/digits/_ or Hangul).
+  const match = before.match(/@([A-Za-z0-9_가-힣]*)$/);
+  if (!match) { closeMentionDropdown(); return; }
+
+  const query = match[1].toLowerCase();
+  const tokenStart = caret - match[0].length; // index of the '@'
+  const matches = getMentionCandidates()
+    .filter(u => u.toLowerCase().startsWith(query));
+
+  if (matches.length === 0) { closeMentionDropdown(); return; }
+
+  mentionState = { textarea, tokenStart, matches, activeIndex: 0 };
+  renderMentionDropdown(textarea, caret);
+}
+
+function renderMentionDropdown(textarea, caret) {
+  const dd = getMentionDropdown();
+  dd.innerHTML = mentionState.matches.map((u, i) =>
+    `<div class="mentionOption${i === mentionState.activeIndex ? ' active' : ''}" data-index="${i}">@${escapeHTML(u)}</div>`
+  ).join('');
+
+  const coords = getCaretCoordinates(textarea, caret);
+  const rect = textarea.getBoundingClientRect();
+  dd.style.left = (rect.left + window.scrollX + coords.left) + 'px';
+  dd.style.top  = (rect.top + window.scrollY + coords.top - textarea.scrollTop + coords.height) + 'px';
+  dd.style.display = 'block';
+
+  dd.querySelectorAll('.mentionOption').forEach(opt => {
+    // mousedown (not click) so it fires before the textarea blur.
+    opt.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      selectMention(parseInt(opt.dataset.index));
+    });
+  });
+}
+
+function selectMention(index) {
+  if (!mentionState) return;
+  const { textarea, tokenStart } = mentionState;
+  const username = mentionState.matches[index];
+  const caret = textarea.selectionStart;
+  const before = textarea.value.slice(0, tokenStart);
+  const after = textarea.value.slice(caret);
+  const insert = `@${username} `;
+
+  textarea.value = before + insert + after;
+  const newCaret = (before + insert).length;
+  closeMentionDropdown();
+  textarea.focus();
+  textarea.setSelectionRange(newCaret, newCaret);
+}
+
+function onMentionKeydown(e, textarea) {
+  const dd = document.getElementById('mentionDropdown');
+  if (!mentionState || !dd || dd.style.display === 'none') return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    mentionState.activeIndex = (mentionState.activeIndex + 1) % mentionState.matches.length;
+    renderMentionDropdown(textarea, textarea.selectionStart);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    mentionState.activeIndex =
+      (mentionState.activeIndex - 1 + mentionState.matches.length) % mentionState.matches.length;
+    renderMentionDropdown(textarea, textarea.selectionStart);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    selectMention(mentionState.activeIndex);
+  } else if (e.key === 'Escape') {
+    closeMentionDropdown();
+  }
+}
+
+// Caret pixel coordinates inside a textarea, via a hidden mirror element.
+function getCaretCoordinates(element, position) {
+  const div = document.createElement('div');
+  const computed = window.getComputedStyle(element);
+  const style = div.style;
+
+  style.position = 'absolute';
+  style.visibility = 'hidden';
+  style.whiteSpace = 'pre-wrap';
+  style.wordWrap = 'break-word';
+
+  [
+    'boxSizing', 'width', 'height', 'overflowX', 'overflowY',
+    'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth',
+    'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+    'fontStyle', 'fontVariant', 'fontWeight', 'fontStretch', 'fontSize',
+    'fontFamily', 'lineHeight', 'textAlign', 'letterSpacing', 'wordSpacing', 'tabSize'
+  ].forEach(p => { style[p] = computed[p]; });
+
+  div.textContent = element.value.slice(0, position);
+  const span = document.createElement('span');
+  span.textContent = element.value.slice(position) || '.';
+  div.appendChild(span);
+
+  document.body.appendChild(div);
+  const lineHeight = parseInt(computed.lineHeight) || Math.round(parseInt(computed.fontSize) * 1.4);
+  const coords = { top: span.offsetTop, left: span.offsetLeft, height: lineHeight };
+  document.body.removeChild(div);
+  return coords;
 }
 
 function cancelInlineReply() {
@@ -367,6 +643,9 @@ function setupCommentForm() {
   `;
 
   document.getElementById('commentForm').addEventListener('submit', handleCommentSubmit);
+
+  const input = document.getElementById('commentInput');
+  if (input) attachMentionAutocomplete(input);
 }
 
 // ─── Handle comment submit ───────────────────────────

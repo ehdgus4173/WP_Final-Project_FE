@@ -90,4 +90,6 @@ const API = {
 
   adminRejectIssue : (id) =>
     apiFetch(`/admin/issues/${id}`, { method: 'DELETE' }),
+  adminRegenerateIssues : (force = false) =>
+    apiFetch('/admin/regenerate-issues', { method: 'POST', body: { force } })
 };

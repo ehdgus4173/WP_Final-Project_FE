@@ -5,6 +5,11 @@ Every day an AI selects one trending issue, an admin reviews and publishes it, a
 
 ![CI](https://github.com/ehdgus4173/WP_Final-Project_FE/actions/workflows/ci.yml/badge.svg)
 
+## Submission
+
+The version submitted for evaluation is **`v1.0.0`** 
+(see [Releases](https://github.com/ehdgus4173/WP_Final-Project_FE/releases)).
+
 ## Live Demo
 
 - **App**: https://wp-final-project-fe.onrender.com
